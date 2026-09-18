@@ -4,25 +4,71 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ministry of Education, Kiribati - IFMIS Budget Dashboard</title>
+  
+  <!-- Chart.js and DataLabels Plugin for Percentages -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+
   <style>
+    :root {
+      --flag-red: #D21034;
+      --flag-blue: #003366;
+      --flag-gold: #FFC400;
+      --flag-azure: #006699;
+      --bg-light: #f4f7f9;
+    }
+
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
       padding: 20px;
-      background-color: #f4f7f9;
+      background-color: var(--bg-light);
       color: #333;
     }
+
     .header {
-      background-color: #003366;
+      background: linear-gradient(135deg, var(--flag-blue) 0%, #001f3f 100%);
       color: #fff;
-      padding: 15px 30px;
+      padding: 20px 30px;
       border-radius: 8px;
       margin-bottom: 20px;
+      border-bottom: 5px solid var(--flag-red);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
-    .header h1 { margin: 0; font-size: 22px; }
-    .header p { margin: 5px 0 0 0; font-size: 13px; opacity: 0.8; }
-    
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .header-logo {
+      width: 75px;
+      height: auto;
+      background: white;
+      padding: 5px;
+      border-radius: 50%;
+      border: 2px solid var(--flag-gold);
+    }
+
+    .header-titles h1 {
+      margin: 0;
+      font-size: 24px;
+      color: #ffffff;
+      letter-spacing: 0.5px;
+    }
+
+    .header-titles p {
+      margin: 4px 0 0 0;
+      font-size: 13px;
+      color: var(--flag-gold);
+      font-style: italic;
+      font-weight: 600;
+    }
+
     .filter-panel {
       background: white;
       padding: 15px 20px;
@@ -33,12 +79,13 @@
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 15px;
     }
-    .filter-group { display: flex; flex-direction: column; }
-    .filter-group label { font-size: 11px; font-weight: bold; color: #555; margin-bottom: 5px; text-transform: uppercase; }
-    .filter-group select { padding: 8px 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 13px; outline: none; }
-    .filter-group select:focus { border-color: #003366; }
 
-    .kpi-section-title { font-size: 13px; font-weight: bold; margin: 15px 0 10px 0; color: #003366; text-transform: uppercase; letter-spacing: 0.5px; }
+    .filter-group { display: flex; flex-direction: column; }
+    .filter-group label { font-size: 11px; font-weight: bold; color: var(--flag-blue); margin-bottom: 5px; text-transform: uppercase; }
+    .filter-group select { padding: 8px 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 13px; outline: none; }
+    .filter-group select:focus { border-color: var(--flag-red); }
+
+    .kpi-section-title { font-size: 13px; font-weight: bold; margin: 15px 0 10px 0; color: var(--flag-blue); text-transform: uppercase; letter-spacing: 0.5px; }
 
     .kpi-container {
       display: grid;
@@ -46,29 +93,35 @@
       gap: 12px;
       margin-bottom: 20px;
     }
+
     .kpi-card {
       background: white;
       padding: 12px 15px;
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      border-left: 4px solid #003366;
+      border-left: 4px solid var(--flag-blue);
     }
-    .kpi-card.category { border-left-color: #27ae60; }
+
+    .kpi-card.category { border-left-color: var(--flag-red); }
     .kpi-card h3 { margin: 0; font-size: 11px; color: #666; text-transform: uppercase; }
     .kpi-card .value { font-size: 16px; font-weight: bold; margin-top: 6px; color: #111; }
 
     .charts-container {
       display: grid;
-      grid-template-columns: 2fr 1fr;
+      grid-template-columns: 1.5fr 1fr;
       gap: 20px;
       margin-bottom: 25px;
     }
+
     .chart-box {
       background: white;
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
+
+    .chart-box h3 { margin-top: 0; color: var(--flag-blue); font-size: 14px; }
+
     .table-container {
       background: white;
       padding: 20px;
@@ -76,9 +129,10 @@
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
       overflow-x: auto;
     }
+
     table { width: 100%; border-collapse: collapse; font-size: 12px; }
     th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #ddd; }
-    th { background-color: #f8f9fa; font-weight: 600; color: #003366; }
+    th { background-color: #f8f9fa; font-weight: 600; color: var(--flag-blue); }
     
     .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; display: inline-block; }
     .status-good { background: #d4edda; color: #155724; }
@@ -89,13 +143,19 @@
 <body>
 
   <div class="header">
-    <h1>Ministry of Education, Kiribati</h1>
-    <p>Consolidated Divisional Budget Execution & Performance Dashboard</p>
+    <div class="header-left">
+      <!-- Official Kiribati Crest / MOE Logo -->
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Coat_of_arms_of_Kiribati.svg/250px-Coat_of_arms_of_Kiribati.svg.png" alt="MOE Kiribati Crest" class="header-logo">
+      <div class="header-titles">
+        <h1>Ministry of Education, Kiribati</h1>
+        <p>"Education is everyone's business"</p>
+      </div>
+    </div>
   </div>
 
   <div class="filter-panel">
     <div class="filter-group">
-      <label for="filter-division">Division</label>
+      <label for="filter-division">Division Filter</label>
       <select id="filter-division" onchange="applyFilters()"><option value="ALL">All Divisions</option></select>
     </div>
     <div class="filter-group">
@@ -158,8 +218,8 @@
       <canvas id="barChart"></canvas>
     </div>
     <div class="chart-box">
-      <h3>Expenditure Distribution by Category</h3>
-      <canvas id="doughnutChart"></canvas>
+      <h3>Expenditure Share by Category (%)</h3>
+      <canvas id="pieChart"></canvas>
     </div>
   </div>
 
@@ -183,7 +243,9 @@
   </div>
 
   <script>
-    // Master Dataset aligned to official MOE numbers and 15 divisions
+    // Register the DataLabels plugin for percentages on charts
+    Chart.register(ChartDataLabels);
+
     const moeData = [
       { code: "1501", division: "1501 - Administration", category: "Personal Emolument (Payroll)", approved: 3500000, revised: 3650000, expenditure: 2200000 },
       { code: "1501", division: "1501 - Administration", category: "Operational", approved: 1200000, revised: 1300000, expenditure: 850000 },
@@ -207,7 +269,7 @@
     ];
 
     let barChartInstance = null;
-    let doughnutChartInstance = null;
+    let pieChartInstance = null;
 
     function fmt(val) { 
       return '$' + val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); 
@@ -310,30 +372,49 @@
 
       // Update Visual Charts
       if (barChartInstance) barChartInstance.destroy();
-      if (doughnutChartInstance) doughnutChartInstance.destroy();
+      if (pieChartInstance) pieChartInstance.destroy();
 
+      // Bar Chart - Kiribati Blue & Red Theme
       barChartInstance = new Chart(document.getElementById('barChart'), {
         type: 'bar',
         data: {
           labels: consolidatedList.map(d => d.code),
           datasets: [
             { label: 'Total Expenditure', data: consolidatedList.map(d => d.expenditure), backgroundColor: '#003366' },
-            { label: 'Available Balance', data: consolidatedList.map(d => d.revised - d.expenditure), backgroundColor: '#2ecc71' }
+            { label: 'Available Balance', data: consolidatedList.map(d => d.revised - d.expenditure), backgroundColor: '#D21034' }
           ]
         },
-        options: { responsive: true }
+        options: {
+          responsive: true,
+          plugins: { datalabels: { display: false } }
+        }
       });
 
-      doughnutChartInstance = new Chart(document.getElementById('doughnutChart'), {
-        type: 'doughnut',
+      // Pie Chart - Kiribati Flag Palette + Direct Percentage Display
+      const pieTotal = catPE + catOp + catOC + catLCDF + Math.abs(catRev);
+      pieChartInstance = new Chart(document.getElementById('pieChart'), {
+        type: 'pie',
         data: {
           labels: ['Personal Emolument', 'Operational', 'Other Commitments', 'LCDF', 'Revenue'],
           datasets: [{
             data: [catPE, catOp, catOC, catLCDF, Math.abs(catRev)],
-            backgroundColor: ['#003366', '#3498db', '#e67e22', '#9b59b6', '#2ecc71']
+            backgroundColor: ['#003366', '#D21034', '#FFC400', '#006699', '#E67E22']
           }]
         },
-        options: { responsive: true }
+        options: {
+          responsive: true,
+          plugins: {
+            datalabels: {
+              color: '#ffffff',
+              font: { weight: 'bold', size: 11 },
+              formatter: (value) => {
+                if (value === 0 || pieTotal === 0) return '';
+                let percentage = ((value / pieTotal) * 100).toFixed(1) + '%';
+                return percentage;
+              }
+            }
+          }
+        }
       });
     }
 
