@@ -97,8 +97,14 @@
     .filter-group select { padding: 9px 12px; border-radius: 6px; border: 1px solid #ccc; font-size: 13px; outline: none; background: #fff; }
     .filter-group select:focus { border-color: var(--kiribati-red); }
 
-    .kpi-section-title { font-size: 13px; font-weight: bold; margin: 18px 0 10px 0; color: #ffffff; text-transform: uppercase; letter-spacing: 0.8px; }
-    .kpi-section-title.dark { color: var(--kiribati-blue); }
+    .kpi-section-title { 
+      font-size: 13px; 
+      font-weight: bold; 
+      margin: 18px 0 10px 0; 
+      color: var(--kiribati-blue); 
+      text-transform: uppercase; 
+      letter-spacing: 0.8px; 
+    }
 
     .kpi-container {
       display: grid;
@@ -160,8 +166,15 @@
   <div class="main-wrapper">
     <div class="header">
       <div class="header-left">
-        <!-- MOE Official Crest Logo -->
-        <img src="MOE logo_2.jpg" alt="MOE Kiribati Crest" class="header-logo" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Coat_of_arms_of_Kiribati.svg/250px-Coat_of_arms_of_Kiribati.svg.png'">
+        <!-- SVG Inline Seal Logo -->
+        <svg class="header-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="48" fill="#ffffff" stroke="#002B5B" stroke-width="3"/>
+          <path d="M 50 10 A 40 40 0 0 1 50 90 A 40 40 0 0 1 50 10" fill="none" stroke="#CE1126" stroke-width="2" stroke-dasharray="4,2"/>
+          <path d="M 20 40 L 50 25 L 80 40 L 50 55 Z" fill="#FCD116" stroke="#002B5B" stroke-width="1.5"/>
+          <path d="M 30 50 L 50 38 L 70 50 L 50 62 Z" fill="#CE1126"/>
+          <text x="50" y="75" font-size="8" font-weight="bold" text-anchor="middle" fill="#002B5B" font-family="Arial">MOE KIRIBATI</text>
+        </svg>
+
         <div class="header-titles">
           <h1>Ministry of Education, Kiribati</h1>
           <p>"Education is Everyone's Business"</p>
@@ -204,7 +217,7 @@
       </div>
     </div>
 
-    <div class="kpi-section-title dark">Category Breakdown KPIs</div>
+    <div class="kpi-section-title">Category Breakdown KPIs</div>
     <div class="kpi-container">
       <div class="kpi-card category">
         <h3>Personal Emolument</h3>
