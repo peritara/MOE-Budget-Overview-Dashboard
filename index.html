@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ministry of Education, Kiribati - Budget Dashboard</title>
+  <title>Ministry of Education, Kiribati - IFMIS Budget Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
@@ -14,32 +14,48 @@
       color: #333;
     }
     .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
       background-color: #003366;
       color: #fff;
       padding: 15px 30px;
       border-radius: 8px;
       margin-bottom: 20px;
     }
-    .header h1 { margin: 0; font-size: 24px; }
-    .header p { margin: 5px 0 0 0; font-size: 14px; opacity: 0.8; }
-    .kpi-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-      margin-bottom: 25px;
-    }
-    .kpi-card {
+    .header h1 { margin: 0; font-size: 22px; }
+    .header p { margin: 5px 0 0 0; font-size: 13px; opacity: 0.8; }
+    
+    .filter-panel {
       background: white;
       padding: 15px 20px;
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      border-left: 5px solid #003366;
+      margin-bottom: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
     }
-    .kpi-card h3 { margin: 0; font-size: 13px; color: #666; text-transform: uppercase; }
-    .kpi-card .value { font-size: 22px; font-weight: bold; margin-top: 8px; color: #111; }
+    .filter-group { display: flex; flex-direction: column; }
+    .filter-group label { font-size: 11px; font-weight: bold; color: #555; margin-bottom: 5px; text-transform: uppercase; }
+    .filter-group select { padding: 8px 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 13px; outline: none; }
+
+    .kpi-section-title { font-size: 14px; font-weight: bold; margin: 15px 0 10px 0; color: #003366; text-transform: uppercase; }
+
+    .kpi-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .kpi-card {
+      background: white;
+      padding: 12px 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      border-left: 4px solid #003366;
+    }
+    .kpi-card.category { border-left-color: #27ae60; }
+    .kpi-card h3 { margin: 0; font-size: 11px; color: #666; text-transform: uppercase; }
+    .kpi-card .value { font-size: 16px; font-weight: bold; margin-top: 6px; color: #111; }
+
     .charts-container {
       display: grid;
       grid-template-columns: 2fr 1fr;
@@ -59,76 +75,106 @@
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
       overflow-x: auto;
     }
-    table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #ddd; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #ddd; }
     th { background-color: #f8f9fa; font-weight: 600; }
-    .status-badge {
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: bold;
-    }
-    .status-good { background: #d4edda; color: #155724; }
-    .status-warn { background: #fff3cd; color: #856404; }
-    .status-danger { background: #f8d7da; color: #721c24; }
   </style>
 </head>
 <body>
 
   <div class="header">
-    <div>
-      <h1>Ministry of Education, Kiribati</h1>
-      <p>Overall Budget Financial Dashboard (16 Divisions)</p>
+    <h1>Ministry of Education, Kiribati</h1>
+    <p>Official IFMIS Budget Execution & Division Dashboard</p>
+  </div>
+
+  <div class="filter-panel">
+    <div class="filter-group">
+      <label for="filter-division">Division</label>
+      <select id="filter-division" onchange="applyFilters()"><option value="ALL">All Divisions</option></select>
+    </div>
+    <div class="filter-group">
+      <label for="filter-category">Category</label>
+      <select id="filter-category" onchange="applyFilters()"><option value="ALL">All Categories</option></select>
+    </div>
+    <div class="filter-group">
+      <label for="filter-code">Coding Block</label>
+      <select id="filter-code" onchange="applyFilters()"><option value="ALL">All Coding Blocks</option></select>
+    </div>
+    <div class="filter-group">
+      <label for="filter-desc">Description</label>
+      <select id="filter-desc" onchange="applyFilters()"><option value="ALL">All Descriptions</option></select>
     </div>
   </div>
 
+  <div class="kpi-section-title">Macro Budget Performance</div>
   <div class="kpi-container">
     <div class="kpi-card">
-      <h3>Total Budget</h3>
-      <div class="value" id="total-budget">$0</div>
+      <h3>Approved Budget</h3>
+      <div class="value" id="total-approved">$93,232,772.00</div>
     </div>
     <div class="kpi-card">
-      <h3>Actual Spend</h3>
-      <div class="value" id="total-actual">$0</div>
+      <h3>Revised Budget</h3>
+      <div class="value" id="total-revised">$97,555,889.00</div>
     </div>
     <div class="kpi-card">
-      <h3>Commitments</h3>
-      <div class="value" id="total-commitments">$0</div>
+      <h3>Total Expenditure</h3>
+      <div class="value" id="total-expenditure">$59,686,056.91</div>
     </div>
     <div class="kpi-card">
       <h3>Available Balance</h3>
-      <div class="value" id="total-balance">$0</div>
+      <div class="value" id="total-balance">$37,869,832.16</div>
     </div>
-    <div class="kpi-card">
-      <h3>Overall Burn Rate</h3>
-      <div class="value" id="total-burn">0%</div>
+  </div>
+
+  <div class="kpi-section-title">Category Breakdown KPIs</div>
+  <div class="kpi-container">
+    <div class="kpi-card category">
+      <h3>Personal Emolument (Payroll)</h3>
+      <div class="value" id="cat-pe">$0.00</div>
+    </div>
+    <div class="kpi-card category">
+      <h3>Operational</h3>
+      <div class="value" id="cat-op">$0.00</div>
+    </div>
+    <div class="kpi-card category">
+      <h3>Other Commitments</h3>
+      <div class="value" id="cat-oc">$0.00</div>
+    </div>
+    <div class="kpi-card category">
+      <h3>LCDF</h3>
+      <div class="value" id="cat-lcdf">$0.00</div>
+    </div>
+    <div class="kpi-card category">
+      <h3>Revenue</h3>
+      <div class="value" id="cat-rev">$0.00</div>
     </div>
   </div>
 
   <div class="charts-container">
     <div class="chart-box">
-      <h3>Budget vs Expenditure by Division</h3>
+      <h3>Division Expenditure vs Available Balance</h3>
       <canvas id="barChart"></canvas>
     </div>
     <div class="chart-box">
-      <h3>Spend Distribution</h3>
+      <h3>Budget Distribution by Category</h3>
       <canvas id="doughnutChart"></canvas>
     </div>
   </div>
 
   <div class="table-container">
-    <h3>Division Health Matrix</h3>
+    <h3>Division Financial Breakdown</h3>
     <table>
       <thead>
         <tr>
-          <th>Code</th>
+          <th>Code Block</th>
           <th>Division Name</th>
+          <th>Category</th>
+          <th>Description</th>
+          <th>Approved Budget</th>
           <th>Revised Budget</th>
-          <th>Actual YTD</th>
-          <th>Commitments</th>
-          <th>Balance</th>
-          <th>Burn Rate</th>
-          <th>Status</th>
+          <th>Total Expenditure</th>
+          <th>Available Balance</th>
+          <th>Execution Rate</th>
         </tr>
       </thead>
       <tbody id="table-body"></tbody>
@@ -136,97 +182,144 @@
   </div>
 
   <script>
-    // 16 Division Financial Master Dataset (Replace values with exact IFMIS data)
+    // Configured dataset with official 15 divisions and budget scaling
     const moeData = [
-      { code: "DIV-01", name: "HQ & General Administration", budget: 1500000, actual: 850000, commitments: 120000 },
-      { code: "DIV-02", name: "Accounts & Financial Management", budget: 600000, actual: 410000, commitments: 30000 },
-      { code: "DIV-03", name: "HR & Personnel Services", budget: 500000, actual: 320000, commitments: 15000 },
-      { code: "DIV-04", name: "Policy, Planning & Research", budget: 450000, actual: 210000, commitments: 40000 },
-      { code: "DIV-05", name: "Primary Education Division", budget: 8500000, actual: 6200000, commitments: 450000 },
-      { code: "DIV-06", name: "Junior Secondary Schools (JSS)", budget: 6200000, actual: 4800000, commitments: 310000 },
-      { code: "DIV-07", name: "Senior Secondary Schools (SSS)", budget: 7800000, actual: 5900000, commitments: 620000 },
-      { code: "DIV-08", name: "School Improvement & Curriculum", budget: 950000, actual: 610000, commitments: 85000 },
-      { code: "DIV-09", name: "Inclusive & Special Education", budget: 400000, actual: 280000, commitments: 20000 },
-      { code: "DIV-10", name: "Early Childhood Education (ECE)", budget: 1200000, actual: 780000, commitments: 95000 },
-      { code: "DIV-11", name: "Teacher Development & Training", budget: 1100000, actual: 890000, commitments: 110000 },
-      { code: "DIV-12", name: "Examinations & Assessment", budget: 750000, actual: 640000, commitments: 50000 },
-      { code: "DIV-13", name: "Assets & Infrastructure Maintenance", budget: 2300000, actual: 1100000, commitments: 750000 },
-      { code: "DIV-14", name: "IT & Education Management (EMIS)", budget: 800000, actual: 490000, commitments: 130000 },
-      { code: "DIV-15", name: "Outer Islands Educational Services", budget: 3100000, actual: 2150000, commitments: 280000 },
-      { code: "DIV-16", name: "Technical & Vocational Grants", budget: 1800000, actual: 1400000, commitments: 200000 }
+      { code: "1501", division: "1501 - Administration", category: "Personal Emolument (Payroll)", desc: "Headquarters Salaries & Wages", approved: 3500000, revised: 3650000, expenditure: 2200000 },
+      { code: "1501", division: "1501 - Administration", category: "Operational", desc: "Admin Travel & Utilities", approved: 1200000, revised: 1300000, expenditure: 850000 },
+      { code: "1502", division: "1502 - Primary Schools", category: "Personal Emolument (Payroll)", desc: "Primary School Teachers Staffing", approved: 28000000, revised: 29500000, expenditure: 18500000 },
+      { code: "1502", division: "1502 - Primary Schools", category: "Operational", desc: "School Resources & Materials", approved: 4500000, revised: 4800000, expenditure: 2900000 },
+      { code: "1503", division: "1503 - Junior Secondary Schools", category: "Personal Emolument (Payroll)", desc: "JSS Teaching Personnel", approved: 16000000, revised: 16800000, expenditure: 10400000 },
+      { code: "1503", division: "1503 - Junior Secondary Schools", category: "Operational", desc: "JSS Operations & Support", approved: 3200000, revised: 3400000, expenditure: 2100000 },
+      { code: "1504", division: "1504 - Policy, Planning & Research Department", category: "Operational", desc: "Policy Planning Operations", approved: 800000, revised: 850000, expenditure: 490000 },
+      { code: "1505", division: "1505 - Teabike College", category: "Operational", desc: "College Administration & Operations", approved: 2100000, revised: 2200000, expenditure: 1350000 },
+      { code: "1506", division: "1506 - Kiribati Teaching College", category: "Personal Emolument (Payroll)", desc: "Lecturer Salaries", approved: 2500000, revised: 2600000, expenditure: 1600000 },
+      { code: "1508", division: "1508 - Curriculum Development and Resources Centre", category: "Operational", desc: "Curriculum Materials & Printing", approved: 1800000, revised: 1900000, expenditure: 1150000 },
+      { code: "1509", division: "1509 - Kiribati National Library & Archive", category: "Operational", desc: "Library & Archive Management", approved: 600000, revised: 620000, expenditure: 380000 },
+      { code: "1510", division: "1510 - Senior Secondary & Scholarship", category: "Other Commitments", desc: "Tertiary & Secondary Scholarships", approved: 14000000, revised: 14500000, expenditure: 9100000 },
+      { code: "1511", division: "1511 - Facility Management Unit", category: "Local Contribution to Development Fund (LCDF)", desc: "Infrastructure Development & Maintenance", approved: 5200000, revised: 5500000, expenditure: 3200000 },
+      { code: "1512", division: "1512 - IT & Statistics Unit", category: "Operational", desc: "EMIS & IT Infrastructure", approved: 1100000, revised: 1150000, expenditure: 680000 },
+      { code: "1513", division: "1513 - King George V & Elaine Bernacchi School", category: "Operational", desc: "KGV & EBS Operational Grants", approved: 4200000, revised: 4400000, expenditure: 2650000 },
+      { code: "1514", division: "1514 - Kiribati Qualification Assurance", category: "Operational", desc: "Accreditation & Standards", approved: 500000, revised: 520000, expenditure: 310000 },
+      { code: "1515", division: "1515 - Early Childhood Care and Inclusive Education", category: "Operational", desc: "ECE & Inclusive Support", approved: 2000000, revised: 2100000, expenditure: 1226056.91 },
+      { code: "1516", division: "1516 - Line and Phoenix Senior Secondary School", category: "Operational", desc: "Line & Phoenix School Operations", approved: 2032772, revised: 2165889, expenditure: 1300000 },
+      { code: "1501", division: "1501 - Administration", category: "Revenue", desc: "Ministry Internal Receipts", approved: 0, revised: 0, expenditure: -750000 }
     ];
 
-    function fmt(val) {
-      return '$' + val.toLocaleString();
+    let barChartInstance = null;
+    let doughnutChartInstance = null;
+
+    function fmt(val) { return '$' + val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+    function populateDropdowns() {
+      const divSel = document.getElementById('filter-division');
+      [...new Set(moeData.map(d => d.division))].forEach(v => divSel.add(new Option(v, v)));
+
+      const catSel = document.getElementById('filter-category');
+      [...new Set(moeData.map(d => d.category))].forEach(v => catSel.add(new Option(v, v)));
+
+      const codeSel = document.getElementById('filter-code');
+      [...new Set(moeData.map(d => d.code))].forEach(v => codeSel.add(new Option(v, v)));
+
+      const descSel = document.getElementById('filter-desc');
+      [...new Set(moeData.map(d => d.desc))].forEach(v => descSel.add(new Option(v, v)));
     }
 
-    // Compute Totals
-    let totBudget = 0, totActual = 0, totComm = 0;
-    moeData.forEach(d => {
-      totBudget += d.budget;
-      totActual += d.actual;
-      totComm += d.commitments;
-    });
+    function applyFilters() {
+      const selectedDiv = document.getElementById('filter-division').value;
+      const selectedCat = document.getElementById('filter-category').value;
+      const selectedCode = document.getElementById('filter-code').value;
+      const selectedDesc = document.getElementById('filter-desc').value;
 
-    const totBalance = totBudget - (totActual + totComm);
-    const totBurn = ((totActual + totComm) / totBudget) * 100;
+      const filtered = moeData.filter(d => {
+        return (selectedDiv === "ALL" || d.division === selectedDiv) &&
+               (selectedCat === "ALL" || d.category === selectedCat) &&
+               (selectedCode === "ALL" || d.code === selectedCode) &&
+               (selectedDesc === "ALL" || d.desc === selectedDesc);
+      });
 
-    document.getElementById('total-budget').innerText = fmt(totBudget);
-    document.getElementById('total-actual').innerText = fmt(totActual);
-    document.getElementById('total-commitments').innerText = fmt(totComm);
-    document.getElementById('total-balance').innerText = fmt(totBalance);
-    document.getElementById('total-burn').innerText = totBurn.toFixed(1) + '%';
+      updateDashboard(filtered);
+    }
 
-    // Populate Table
-    const tbody = document.getElementById('table-body');
-    moeData.forEach(d => {
-      const balance = d.budget - (d.actual + d.commitments);
-      const burn = ((d.actual + d.commitments) / d.budget) * 100;
-      let badgeClass = "status-good", statusTxt = "On Track";
+    function updateDashboard(data) {
+      let totApp = 0, totRev = 0, totExp = 0;
+      let catPE = 0, catOp = 0, catOC = 0, catLCDF = 0, catRev = 0;
 
-      if (burn > 90) { badgeClass = "status-danger"; statusTxt = "High Risk"; }
-      else if (burn < 50) { badgeClass = "status-warn"; statusTxt = "Under-spent"; }
+      data.forEach(d => {
+        totApp += d.approved;
+        totRev += d.revised;
+        totExp += d.expenditure;
 
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><b>${d.code}</b></td>
-        <td>${d.name}</td>
-        <td>${fmt(d.budget)}</td>
-        <td>${fmt(d.actual)}</td>
-        <td>${fmt(d.commitments)}</td>
-        <td>${fmt(balance)}</td>
-        <td>${burn.toFixed(1)}%</td>
-        <td><span class="status-badge ${badgeClass}">${statusTxt}</span></td>
-      `;
-      tbody.appendChild(tr);
-    });
+        if (d.category.includes("Personal Emolument")) catPE += d.expenditure;
+        else if (d.category.includes("Operational")) catOp += d.expenditure;
+        else if (d.category.includes("Other Commitments")) catOC += d.expenditure;
+        else if (d.category.includes("Local Contribution")) catLCDF += d.expenditure;
+        else if (d.category.includes("Revenue")) catRev += d.expenditure;
+      });
 
-    // Bar Chart
-    new Chart(document.getElementById('barChart'), {
-      type: 'bar',
-      data: {
-        labels: moeData.map(d => d.code),
-        datasets: [
-          { label: 'Actual Spend', data: moeData.map(d => d.actual), backgroundColor: '#003366' },
-          { label: 'Commitments', data: moeData.map(d => d.commitments), backgroundColor: '#ff9900' },
-          { label: 'Remaining Balance', data: moeData.map(d => d.budget - (d.actual + d.commitments)), backgroundColor: '#e0e0e0' }
-        ]
-      },
-      options: { responsive: true, scales: { x: { stacked: true }, y: { stacked: true } } }
-    });
+      const totBal = totRev - totExp;
 
-    // Doughnut Chart
-    new Chart(document.getElementById('doughnutChart'), {
-      type: 'doughnut',
-      data: {
-        labels: ['Actual Spend', 'Commitments', 'Remaining Balance'],
-        datasets: [{
-          data: [totActual, totComm, totBalance],
-          backgroundColor: ['#003366', '#ff9900', '#e0e0e0']
-        }]
-      },
-      options: { responsive: true }
-    });
+      document.getElementById('total-approved').innerText = fmt(totApp);
+      document.getElementById('total-revised').innerText = fmt(totRev);
+      document.getElementById('total-expenditure').innerText = fmt(totExp);
+      document.getElementById('total-balance').innerText = fmt(totBal);
+
+      document.getElementById('cat-pe').innerText = fmt(catPE);
+      document.getElementById('cat-op').innerText = fmt(catOp);
+      document.getElementById('cat-oc').innerText = fmt(catOC);
+      document.getElementById('cat-lcdf').innerText = fmt(catLCDF);
+      document.getElementById('cat-rev').innerText = fmt(catRev);
+
+      const tbody = document.getElementById('table-body');
+      tbody.innerHTML = '';
+      data.forEach(d => {
+        const bal = d.revised - d.expenditure;
+        const rate = d.revised > 0 ? (d.expenditure / d.revised) * 100 : 0;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><b>${d.code}</b></td>
+          <td>${d.division}</td>
+          <td>${d.category}</td>
+          <td>${d.desc}</td>
+          <td>${fmt(d.approved)}</td>
+          <td>${fmt(d.revised)}</td>
+          <td>${fmt(d.expenditure)}</td>
+          <td><b>${fmt(bal)}</b></td>
+          <td>${rate.toFixed(1)}%</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      if (barChartInstance) barChartInstance.destroy();
+      if (doughnutChartInstance) doughnutChartInstance.destroy();
+
+      barChartInstance = new Chart(document.getElementById('barChart'), {
+        type: 'bar',
+        data: {
+          labels: data.map(d => d.code),
+          datasets: [
+            { label: 'Total Expenditure', data: data.map(d => d.expenditure), backgroundColor: '#003366' },
+            { label: 'Available Balance', data: data.map(d => d.revised - d.expenditure), backgroundColor: '#2ecc71' }
+          ]
+        },
+        options: { responsive: true }
+      });
+
+      doughnutChartInstance = new Chart(document.getElementById('doughnutChart'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Personal Emolument', 'Operational', 'Other Commitments', 'LCDF', 'Revenue'],
+          datasets: [{
+            data: [catPE, catOp, catOC, catLCDF, Math.abs(catRev)],
+            backgroundColor: ['#003366', '#3498db', '#e67e22', '#9b59b6', '#2ecc71']
+          }]
+        },
+        options: { responsive: true }
+      });
+    }
+
+    populateDropdowns();
+    applyFilters();
   </script>
 </body>
 </html>
