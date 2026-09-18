@@ -5,38 +5,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ministry of Education, Kiribati - IFMIS Budget Dashboard</title>
   
-  <!-- Chart.js and DataLabels Plugin for Percentages -->
+  <!-- Chart.js and DataLabels Plugin -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 
   <style>
     :root {
-      --flag-red: #D21034;
-      --flag-blue: #003366;
-      --flag-gold: #FFC400;
-      --flag-azure: #006699;
-      --bg-light: #f4f7f9;
+      --kiribati-red: #CE1126;
+      --kiribati-blue: #002B5B;
+      --kiribati-gold: #FCD116;
+      --kiribati-azure: #0072CE;
+      --bg-ocean: #eef4f9;
     }
 
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
       padding: 20px;
-      background-color: var(--bg-light);
+      background: linear-gradient(180deg, #002B5B 0%, #004080 180px, var(--bg-ocean) 180px);
+      background-repeat: no-repeat;
       color: #333;
     }
 
+    .main-wrapper {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
     .header {
-      background: linear-gradient(135deg, var(--flag-blue) 0%, #001f3f 100%);
+      background: linear-gradient(135deg, var(--kiribati-red) 0%, #a00c1c 100%);
       color: #fff;
       padding: 20px 30px;
-      border-radius: 8px;
+      border-radius: 12px;
       margin-bottom: 20px;
-      border-bottom: 5px solid var(--flag-red);
+      border-bottom: 6px solid var(--kiribati-gold);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
     }
 
     .header-left {
@@ -46,65 +52,72 @@
     }
 
     .header-logo {
-      width: 75px;
-      height: auto;
-      background: white;
-      padding: 5px;
+      width: 95px;
+      height: 95px;
+      background: #ffffff;
+      padding: 3px;
       border-radius: 50%;
-      border: 2px solid var(--flag-gold);
+      border: 3px solid var(--kiribati-gold);
+      object-fit: contain;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
 
     .header-titles h1 {
       margin: 0;
-      font-size: 24px;
+      font-size: 26px;
       color: #ffffff;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
     }
 
     .header-titles p {
-      margin: 4px 0 0 0;
-      font-size: 13px;
-      color: var(--flag-gold);
+      margin: 6px 0 0 0;
+      font-size: 14px;
+      color: var(--kiribati-gold);
       font-style: italic;
-      font-weight: 600;
+      font-weight: 700;
+      letter-spacing: 0.5px;
     }
 
     .filter-panel {
       background: white;
-      padding: 15px 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      padding: 18px 22px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
       margin-bottom: 20px;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 15px;
+      border-top: 3px solid var(--kiribati-blue);
     }
 
     .filter-group { display: flex; flex-direction: column; }
-    .filter-group label { font-size: 11px; font-weight: bold; color: var(--flag-blue); margin-bottom: 5px; text-transform: uppercase; }
-    .filter-group select { padding: 8px 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 13px; outline: none; }
-    .filter-group select:focus { border-color: var(--flag-red); }
+    .filter-group label { font-size: 11px; font-weight: bold; color: var(--kiribati-blue); margin-bottom: 6px; text-transform: uppercase; }
+    .filter-group select { padding: 9px 12px; border-radius: 6px; border: 1px solid #ccc; font-size: 13px; outline: none; background: #fff; }
+    .filter-group select:focus { border-color: var(--kiribati-red); }
 
-    .kpi-section-title { font-size: 13px; font-weight: bold; margin: 15px 0 10px 0; color: var(--flag-blue); text-transform: uppercase; letter-spacing: 0.5px; }
+    .kpi-section-title { font-size: 13px; font-weight: bold; margin: 18px 0 10px 0; color: #ffffff; text-transform: uppercase; letter-spacing: 0.8px; }
+    .kpi-section-title.dark { color: var(--kiribati-blue); }
 
     .kpi-container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-      gap: 12px;
-      margin-bottom: 20px;
+      gap: 14px;
+      margin-bottom: 22px;
     }
 
     .kpi-card {
       background: white;
-      padding: 12px 15px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      border-left: 4px solid var(--flag-blue);
+      padding: 14px 16px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+      border-left: 5px solid var(--kiribati-blue);
     }
 
-    .kpi-card.category { border-left-color: var(--flag-red); }
-    .kpi-card h3 { margin: 0; font-size: 11px; color: #666; text-transform: uppercase; }
-    .kpi-card .value { font-size: 16px; font-weight: bold; margin-top: 6px; color: #111; }
+    .kpi-card.category { border-left-color: var(--kiribati-red); }
+    .kpi-card h3 { margin: 0; font-size: 11px; color: #555; text-transform: uppercase; }
+    .kpi-card .value { font-size: 16px; font-weight: bold; margin-top: 8px; color: #111; }
 
     .charts-container {
       display: grid;
@@ -115,26 +128,28 @@
 
     .chart-box {
       background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      padding: 22px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
 
-    .chart-box h3 { margin-top: 0; color: var(--flag-blue); font-size: 14px; }
+    .chart-box h3 { margin-top: 0; color: var(--kiribati-blue); font-size: 14px; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; }
 
     .table-container {
       background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      padding: 22px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
       overflow-x: auto;
     }
 
+    .table-container h3 { margin-top: 0; color: var(--kiribati-blue); font-size: 15px; margin-bottom: 15px; }
+
     table { width: 100%; border-collapse: collapse; font-size: 12px; }
-    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #ddd; }
-    th { background-color: #f8f9fa; font-weight: 600; color: var(--flag-blue); }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #eef2f5; }
+    th { background-color: #f4f7fb; font-weight: 700; color: var(--kiribati-blue); }
     
-    .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; display: inline-block; }
+    .status-badge { padding: 4px 9px; border-radius: 4px; font-size: 10px; font-weight: bold; display: inline-block; }
     .status-good { background: #d4edda; color: #155724; }
     .status-warn { background: #fff3cd; color: #856404; }
     .status-danger { background: #f8d7da; color: #721c24; }
@@ -142,108 +157,109 @@
 </head>
 <body>
 
-  <div class="header">
-    <div class="header-left">
-      <!-- Official Kiribati Crest / MOE Logo -->
-      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Coat_of_arms_of_Kiribati.svg/250px-Coat_of_arms_of_Kiribati.svg.png" alt="MOE Kiribati Crest" class="header-logo">
-      <div class="header-titles">
-        <h1>Ministry of Education, Kiribati</h1>
-        <p>"Education is everyone's business"</p>
+  <div class="main-wrapper">
+    <div class="header">
+      <div class="header-left">
+        <!-- MOE Official Crest Logo -->
+        <img src="MOE logo_2.jpg" alt="MOE Kiribati Crest" class="header-logo" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Coat_of_arms_of_Kiribati.svg/250px-Coat_of_arms_of_Kiribati.svg.png'">
+        <div class="header-titles">
+          <h1>Ministry of Education, Kiribati</h1>
+          <p>"Education is Everyone's Business"</p>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="filter-panel">
-    <div class="filter-group">
-      <label for="filter-division">Division Filter</label>
-      <select id="filter-division" onchange="applyFilters()"><option value="ALL">All Divisions</option></select>
+    <div class="filter-panel">
+      <div class="filter-group">
+        <label for="filter-division">Division Filter</label>
+        <select id="filter-division" onchange="applyFilters()"><option value="ALL">All Divisions</option></select>
+      </div>
+      <div class="filter-group">
+        <label for="filter-category">Category Filter</label>
+        <select id="filter-category" onchange="applyFilters()"><option value="ALL">All Categories Combined</option></select>
+      </div>
     </div>
-    <div class="filter-group">
-      <label for="filter-category">Category Filter</label>
-      <select id="filter-category" onchange="applyFilters()"><option value="ALL">All Categories Combined</option></select>
-    </div>
-  </div>
 
-  <div class="kpi-section-title">Macro Budget Performance</div>
-  <div class="kpi-container">
-    <div class="kpi-card">
-      <h3>Approved Budget</h3>
-      <div class="value" id="total-approved">$0.00</div>
+    <div class="kpi-section-title">Macro Budget Performance</div>
+    <div class="kpi-container">
+      <div class="kpi-card">
+        <h3>Approved Budget</h3>
+        <div class="value" id="total-approved">$0.00</div>
+      </div>
+      <div class="kpi-card">
+        <h3>Revised Budget</h3>
+        <div class="value" id="total-revised">$0.00</div>
+      </div>
+      <div class="kpi-card">
+        <h3>Total Expenditure</h3>
+        <div class="value" id="total-expenditure">$0.00</div>
+      </div>
+      <div class="kpi-card">
+        <h3>Available Balance</h3>
+        <div class="value" id="total-balance">$0.00</div>
+      </div>
+      <div class="kpi-card">
+        <h3>Overall Utilization</h3>
+        <div class="value" id="total-utilization">0%</div>
+      </div>
     </div>
-    <div class="kpi-card">
-      <h3>Revised Budget</h3>
-      <div class="value" id="total-revised">$0.00</div>
-    </div>
-    <div class="kpi-card">
-      <h3>Total Expenditure</h3>
-      <div class="value" id="total-expenditure">$0.00</div>
-    </div>
-    <div class="kpi-card">
-      <h3>Available Balance</h3>
-      <div class="value" id="total-balance">$0.00</div>
-    </div>
-    <div class="kpi-card">
-      <h3>Overall Utilization</h3>
-      <div class="value" id="total-utilization">0%</div>
-    </div>
-  </div>
 
-  <div class="kpi-section-title">Category Breakdown KPIs</div>
-  <div class="kpi-container">
-    <div class="kpi-card category">
-      <h3>Personal Emolument</h3>
-      <div class="value" id="cat-pe">$0.00</div>
+    <div class="kpi-section-title dark">Category Breakdown KPIs</div>
+    <div class="kpi-container">
+      <div class="kpi-card category">
+        <h3>Personal Emolument</h3>
+        <div class="value" id="cat-pe">$0.00</div>
+      </div>
+      <div class="kpi-card category">
+        <h3>Operational</h3>
+        <div class="value" id="cat-op">$0.00</div>
+      </div>
+      <div class="kpi-card category">
+        <h3>Other Commitments</h3>
+        <div class="value" id="cat-oc">$0.00</div>
+      </div>
+      <div class="kpi-card category">
+        <h3>LCDF</h3>
+        <div class="value" id="cat-lcdf">$0.00</div>
+      </div>
+      <div class="kpi-card category">
+        <h3>Revenue</h3>
+        <div class="value" id="cat-rev">$0.00</div>
+      </div>
     </div>
-    <div class="kpi-card category">
-      <h3>Operational</h3>
-      <div class="value" id="cat-op">$0.00</div>
-    </div>
-    <div class="kpi-card category">
-      <h3>Other Commitments</h3>
-      <div class="value" id="cat-oc">$0.00</div>
-    </div>
-    <div class="kpi-card category">
-      <h3>LCDF</h3>
-      <div class="value" id="cat-lcdf">$0.00</div>
-    </div>
-    <div class="kpi-card category">
-      <h3>Revenue</h3>
-      <div class="value" id="cat-rev">$0.00</div>
-    </div>
-  </div>
 
-  <div class="charts-container">
-    <div class="chart-box">
-      <h3>Divisional Expenditure vs Available Balance</h3>
-      <canvas id="barChart"></canvas>
+    <div class="charts-container">
+      <div class="chart-box">
+        <h3>Divisional Expenditure vs Available Balance</h3>
+        <canvas id="barChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3>Expenditure Share by Category (%)</h3>
+        <canvas id="pieChart"></canvas>
+      </div>
     </div>
-    <div class="chart-box">
-      <h3>Expenditure Share by Category (%)</h3>
-      <canvas id="pieChart"></canvas>
-    </div>
-  </div>
 
-  <div class="table-container">
-    <h3>Consolidated Divisional Financial Report</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Code</th>
-          <th>Division Name</th>
-          <th>Approved Budget</th>
-          <th>Revised Budget</th>
-          <th>Total Expenditure</th>
-          <th>Available Balance</th>
-          <th>Utilization %</th>
-          <th>Alert Remarks</th>
-        </tr>
-      </thead>
-      <tbody id="table-body"></tbody>
-    </table>
+    <div class="table-container">
+      <h3>Consolidated Divisional Financial Report</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Division Name</th>
+            <th>Approved Budget</th>
+            <th>Revised Budget</th>
+            <th>Total Expenditure</th>
+            <th>Available Balance</th>
+            <th>Utilization %</th>
+            <th>Alert Remarks</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
   </div>
 
   <script>
-    // Register the DataLabels plugin for percentages on charts
     Chart.register(ChartDataLabels);
 
     const moeData = [
@@ -326,7 +342,6 @@
       document.getElementById('cat-lcdf').innerText = fmt(catLCDF);
       document.getElementById('cat-rev').innerText = fmt(catRev);
 
-      // Consolidate data by Division
       const divisionMap = {};
       data.forEach(d => {
         if (!divisionMap[d.code]) {
@@ -345,7 +360,6 @@
 
       const consolidatedList = Object.values(divisionMap);
 
-      // Render Consolidated Table
       const tbody = document.getElementById('table-body');
       tbody.innerHTML = '';
       consolidatedList.forEach(div => {
@@ -370,18 +384,16 @@
         tbody.appendChild(tr);
       });
 
-      // Update Visual Charts
       if (barChartInstance) barChartInstance.destroy();
       if (pieChartInstance) pieChartInstance.destroy();
 
-      // Bar Chart - Kiribati Blue & Red Theme
       barChartInstance = new Chart(document.getElementById('barChart'), {
         type: 'bar',
         data: {
           labels: consolidatedList.map(d => d.code),
           datasets: [
-            { label: 'Total Expenditure', data: consolidatedList.map(d => d.expenditure), backgroundColor: '#003366' },
-            { label: 'Available Balance', data: consolidatedList.map(d => d.revised - d.expenditure), backgroundColor: '#D21034' }
+            { label: 'Total Expenditure', data: consolidatedList.map(d => d.expenditure), backgroundColor: '#002B5B' },
+            { label: 'Available Balance', data: consolidatedList.map(d => d.revised - d.expenditure), backgroundColor: '#CE1126' }
           ]
         },
         options: {
@@ -390,7 +402,6 @@
         }
       });
 
-      // Pie Chart - Kiribati Flag Palette + Direct Percentage Display
       const pieTotal = catPE + catOp + catOC + catLCDF + Math.abs(catRev);
       pieChartInstance = new Chart(document.getElementById('pieChart'), {
         type: 'pie',
@@ -398,7 +409,7 @@
           labels: ['Personal Emolument', 'Operational', 'Other Commitments', 'LCDF', 'Revenue'],
           datasets: [{
             data: [catPE, catOp, catOC, catLCDF, Math.abs(catRev)],
-            backgroundColor: ['#003366', '#D21034', '#FFC400', '#006699', '#E67E22']
+            backgroundColor: ['#002B5B', '#CE1126', '#FCD116', '#0072CE', '#E65100']
           }]
         },
         options: {
@@ -409,8 +420,7 @@
               font: { weight: 'bold', size: 11 },
               formatter: (value) => {
                 if (value === 0 || pieTotal === 0) return '';
-                let percentage = ((value / pieTotal) * 100).toFixed(1) + '%';
-                return percentage;
+                return ((value / pieTotal) * 100).toFixed(1) + '%';
               }
             }
           }
