@@ -11,20 +11,39 @@
 
   <style>
     :root {
-      --kiribati-red: #CE1126;
-      --kiribati-blue: #002B5B;
-      --kiribati-gold: #FCD116;
-      --kiribati-azure: #0072CE;
-      --bg-ocean: #eef4f9;
+      --blue-navy: #002B5B;
+      --blue-primary: #0056b3;
+      --blue-azure: #0072CE;
+      --blue-light: #e6f0fa;
+      --blue-border: #b8d5f2;
+      --text-dark: #1e293b;
     }
 
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
       padding: 20px;
-      background: linear-gradient(180deg, #002B5B 0%, #004080 180px, var(--bg-ocean) 180px);
+      color: var(--text-dark);
+      position: relative;
+      background-color: #f4f7fb;
+      min-height: 100vh;
+    }
+
+    /* Faded Kiribati Flag Watermark Background */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-image: url('Kiribati National Flag.jpg');
+      background-size: cover;
+      background-position: center;
       background-repeat: no-repeat;
-      color: #333;
+      opacity: 0.08; /* Adjust opacity for subtle watermark effect */
+      z-index: -1;
+      pointer-events: none;
     }
 
     .main-wrapper {
@@ -32,17 +51,18 @@
       margin: 0 auto;
     }
 
+    /* Blue Theme Header */
     .header {
-      background: linear-gradient(135deg, var(--kiribati-red) 0%, #a00c1c 100%);
+      background: linear-gradient(135deg, var(--blue-navy) 0%, var(--blue-primary) 100%);
       color: #fff;
       padding: 20px 30px;
       border-radius: 12px;
       margin-bottom: 20px;
-      border-bottom: 6px solid var(--kiribati-gold);
+      border-bottom: 5px solid var(--blue-azure);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      box-shadow: 0 8px 16px rgba(0, 43, 91, 0.25);
     }
 
     .header-left {
@@ -51,13 +71,13 @@
       gap: 20px;
     }
 
-    /* Container for logo image */
+    /* Circular Logo Container */
     .header-logo-container {
       width: 90px;
       height: 90px;
       background: #ffffff;
       border-radius: 50%;
-      border: 3px solid var(--kiribati-gold);
+      border: 3px solid var(--blue-azure);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -78,28 +98,29 @@
       color: #ffffff;
       letter-spacing: 0.8px;
       text-transform: uppercase;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
     }
 
     .header-titles p {
       margin: 6px 0 0 0;
       font-size: 14px;
-      color: var(--kiribati-gold);
+      color: #b3d7ff;
       font-style: italic;
-      font-weight: 700;
+      font-weight: 600;
       letter-spacing: 0.5px;
     }
 
     .filter-panel {
-      background: white;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(5px);
       padding: 18px 22px;
       border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+      box-shadow: 0 4px 12px rgba(0,43,91,0.08);
       margin-bottom: 20px;
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
       gap: 15px;
-      border-top: 3px solid var(--kiribati-blue);
+      border-top: 4px solid var(--blue-navy);
     }
 
     .filter-group { 
@@ -110,7 +131,7 @@
     .filter-group label { 
       font-size: 11px; 
       font-weight: bold; 
-      color: var(--kiribati-blue); 
+      color: var(--blue-navy); 
       margin-bottom: 6px; 
       text-transform: uppercase; 
     }
@@ -118,21 +139,22 @@
     .filter-group select { 
       padding: 9px 12px; 
       border-radius: 6px; 
-      border: 1px solid #ccc; 
+      border: 1px solid var(--blue-border); 
       font-size: 12px; 
       outline: none; 
       background: #fff; 
+      color: var(--text-dark);
     }
     
     .filter-group select:focus { 
-      border-color: var(--kiribati-red); 
+      border-color: var(--blue-primary); 
     }
 
     .kpi-section-title { 
       font-size: 13px; 
       font-weight: bold; 
       margin: 18px 0 10px 0; 
-      color: var(--kiribati-blue); 
+      color: var(--blue-navy); 
       text-transform: uppercase; 
       letter-spacing: 0.8px; 
     }
@@ -145,21 +167,21 @@
     }
 
     .kpi-card {
-      background: white;
+      background: rgba(255, 255, 255, 0.95);
       padding: 14px 16px;
       border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-      border-left: 5px solid var(--kiribati-blue);
+      box-shadow: 0 4px 10px rgba(0,43,91,0.06);
+      border-left: 5px solid var(--blue-navy);
     }
 
     .kpi-card.category { 
-      border-left-color: var(--kiribati-red); 
+      border-left-color: var(--blue-azure); 
     }
     
     .kpi-card h3 { 
       margin: 0; 
       font-size: 11px; 
-      color: #555; 
+      color: #475569; 
       text-transform: uppercase; 
     }
     
@@ -167,7 +189,7 @@
       font-size: 15px; 
       font-weight: bold; 
       margin-top: 8px; 
-      color: #111; 
+      color: var(--blue-navy); 
     }
 
     .charts-container {
@@ -178,31 +200,33 @@
     }
 
     .chart-box {
-      background: white;
+      background: rgba(255, 255, 255, 0.95);
       padding: 22px;
       border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 12px rgba(0,43,91,0.06);
+      border: 1px solid rgba(184, 213, 242, 0.4);
     }
 
     .chart-box h3 { 
       margin-top: 0; 
-      color: var(--kiribati-blue); 
+      color: var(--blue-navy); 
       font-size: 14px; 
-      border-bottom: 2px solid #f0f0f0; 
+      border-bottom: 2px solid var(--blue-light); 
       padding-bottom: 8px; 
     }
 
     .table-container {
-      background: white;
+      background: rgba(255, 255, 255, 0.95);
       padding: 22px;
       border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 12px rgba(0,43,91,0.06);
       overflow-x: auto;
+      border: 1px solid rgba(184, 213, 242, 0.4);
     }
 
     .table-container h3 { 
       margin-top: 0; 
-      color: var(--kiribati-blue); 
+      color: var(--blue-navy); 
       font-size: 15px; 
       margin-bottom: 15px; 
     }
@@ -216,13 +240,13 @@
     th, td { 
       padding: 10px 12px; 
       text-align: left; 
-      border-bottom: 1px solid #eef2f5; 
+      border-bottom: 1px solid #e2e8f0; 
     }
     
     th { 
-      background-color: #f4f7fb; 
+      background-color: var(--blue-light); 
       font-weight: 700; 
-      color: var(--kiribati-blue); 
+      color: var(--blue-navy); 
     }
     
     .status-badge { 
@@ -233,15 +257,15 @@
       display: inline-block; 
     }
     
-    .status-good { background: #d4edda; color: #155724; }
-    .status-warn { background: #fff3cd; color: #856404; }
-    .status-danger { background: #f8d7da; color: #721c24; }
+    .status-good { background: #dbeafe; color: #1e40af; }
+    .status-warn { background: #fef3c7; color: #92400e; }
+    .status-danger { background: #fee2e2; color: #991b1b; }
   </style>
 </head>
 <body>
 
   <div class="main-wrapper">
-    <!-- Header with MOE Logo Image -->
+    <!-- Header with MOE Logo -->
     <div class="header">
       <div class="header-left">
         <div class="header-logo-container">
@@ -371,7 +395,6 @@
       balance: 35254635.82
     };
 
-    // Full list of 16 Divisions (1501-1516)
     const DIVISIONS_MASTER = [
       { code: "1501", name: "1501 Administration" },
       { code: "1502", name: "1502 Primary" },
@@ -480,7 +503,6 @@
       document.getElementById('cat-oc').innerText = fmt(catOC);
       document.getElementById('cat-rev').innerText = fmt(catRev);
 
-      // Consolidate data for all 1501-1516 divisions
       const divisionMap = {};
       DIVISIONS_MASTER.forEach(d => {
         divisionMap[d.code] = {
@@ -529,13 +551,14 @@
       if (barChartInstance) barChartInstance.destroy();
       if (pieChartInstance) pieChartInstance.destroy();
 
+      // Blue themed Bar Chart
       barChartInstance = new Chart(document.getElementById('barChart'), {
         type: 'bar',
         data: {
           labels: consolidatedList.map(d => d.code),
           datasets: [
             { label: 'Total Expenditure', data: consolidatedList.map(d => d.expenditure), backgroundColor: '#002B5B' },
-            { label: 'Available Balance', data: consolidatedList.map(d => d.revised - d.expenditure), backgroundColor: '#CE1126' }
+            { label: 'Available Balance', data: consolidatedList.map(d => d.revised - d.expenditure), backgroundColor: '#0072CE' }
           ]
         },
         options: {
@@ -544,6 +567,7 @@
         }
       });
 
+      // Blue themed Pie Chart
       const pieTotal = Math.abs(catPE) + Math.abs(catOp) + Math.abs(catOC) + Math.abs(catRev);
       pieChartInstance = new Chart(document.getElementById('pieChart'), {
         type: 'pie',
@@ -551,7 +575,7 @@
           labels: ['Personal Emolument', 'Operational', 'Other Commitments', 'Revenue Collections'],
           datasets: [{
             data: [Math.abs(catPE), Math.abs(catOp), Math.abs(catOC), Math.abs(catRev)],
-            backgroundColor: ['#002B5B', '#CE1126', '#FCD116', '#0072CE']
+            backgroundColor: ['#002B5B', '#0056b3', '#0072CE', '#38bdf8']
           }]
         },
         options: {
