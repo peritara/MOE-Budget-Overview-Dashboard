@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ministry of Education, Kiribati - IFMIS Budget Dashboard</title>
+  <title>Ministry of Education, Kiribati - IFMIS Budget Dashboard (01 Oct 2026)</title>
   
   <!-- Chart.js and DataLabels Plugin -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -28,7 +28,7 @@
     }
 
     .main-wrapper {
-      max-width: 1400px;
+      max-width: 1450px;
       margin: 0 auto;
     }
 
@@ -55,7 +55,7 @@
       width: 95px;
       height: 95px;
       background: #ffffff;
-      padding: 3px;
+      padding: 2px;
       border-radius: 50%;
       border: 3px solid var(--kiribati-gold);
       object-fit: contain;
@@ -94,7 +94,7 @@
 
     .filter-group { display: flex; flex-direction: column; }
     .filter-group label { font-size: 11px; font-weight: bold; color: var(--kiribati-blue); margin-bottom: 6px; text-transform: uppercase; }
-    .filter-group select { padding: 9px 12px; border-radius: 6px; border: 1px solid #ccc; font-size: 13px; outline: none; background: #fff; }
+    .filter-group select { padding: 9px 12px; border-radius: 6px; border: 1px solid #ccc; font-size: 12px; outline: none; background: #fff; }
     .filter-group select:focus { border-color: var(--kiribati-red); }
 
     .kpi-section-title { 
@@ -108,7 +108,7 @@
 
     .kpi-container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 14px;
       margin-bottom: 22px;
     }
@@ -123,7 +123,7 @@
 
     .kpi-card.category { border-left-color: var(--kiribati-red); }
     .kpi-card h3 { margin: 0; font-size: 11px; color: #555; text-transform: uppercase; }
-    .kpi-card .value { font-size: 16px; font-weight: bold; margin-top: 8px; color: #111; }
+    .kpi-card .value { font-size: 15px; font-weight: bold; margin-top: 8px; color: #111; }
 
     .charts-container {
       display: grid;
@@ -166,37 +166,41 @@
   <div class="main-wrapper">
     <div class="header">
       <div class="header-left">
-        <!-- SVG Inline Seal Logo -->
-        <svg class="header-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="50" cy="50" r="48" fill="#ffffff" stroke="#002B5B" stroke-width="3"/>
-          <path d="M 50 10 A 40 40 0 0 1 50 90 A 40 40 0 0 1 50 10" fill="none" stroke="#CE1126" stroke-width="2" stroke-dasharray="4,2"/>
-          <path d="M 20 40 L 50 25 L 80 40 L 50 55 Z" fill="#FCD116" stroke="#002B5B" stroke-width="1.5"/>
-          <path d="M 30 50 L 50 38 L 70 50 L 50 62 Z" fill="#CE1126"/>
-          <text x="50" y="75" font-size="8" font-weight="bold" text-anchor="middle" fill="#002B5B" font-family="Arial">MOE KIRIBATI</text>
-        </svg>
-
+        <img src="MOE logo_2.jpg" alt="MOE Kiribati Crest" class="header-logo" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Coat_of_arms_of_Kiribati.svg/250px-Coat_of_arms_of_Kiribati.svg.png'">
         <div class="header-titles">
           <h1>Ministry of Education, Kiribati</h1>
-          <p>"Education is Everyone's Business"</p>
+          <p>"Education is Everyone's Business" — Report Date: 01/10/2026</p>
         </div>
       </div>
     </div>
 
     <div class="filter-panel">
       <div class="filter-group">
-        <label for="filter-division">Division Filter</label>
+        <label for="filter-code">Division Code</label>
+        <select id="filter-code" onchange="applyFilters()"><option value="ALL">All Division Codes</option></select>
+      </div>
+      <div class="filter-group">
+        <label for="filter-division">Division Description</label>
         <select id="filter-division" onchange="applyFilters()"><option value="ALL">All Divisions</option></select>
       </div>
       <div class="filter-group">
-        <label for="filter-category">Category Filter</label>
-        <select id="filter-category" onchange="applyFilters()"><option value="ALL">All Categories Combined</option></select>
+        <label for="filter-category">Budget Category Filter</label>
+        <select id="filter-category" onchange="applyFilters()"><option value="ALL">All Categories</option></select>
+      </div>
+      <div class="filter-group">
+        <label for="filter-linecode">Coding Block Code</label>
+        <select id="filter-linecode" onchange="applyFilters()"><option value="ALL">All Coding Block Codes</option></select>
+      </div>
+      <div class="filter-group">
+        <label for="filter-linedesc">Coding Block Description</label>
+        <select id="filter-linedesc" onchange="applyFilters()"><option value="ALL">All Coding Descriptions</option></select>
       </div>
     </div>
 
     <div class="kpi-section-title">Macro Budget Performance</div>
     <div class="kpi-container">
       <div class="kpi-card">
-        <h3>Approved Budget</h3>
+        <h3>Original Budget</h3>
         <div class="value" id="total-approved">$0.00</div>
       </div>
       <div class="kpi-card">
@@ -212,7 +216,7 @@
         <div class="value" id="total-balance">$0.00</div>
       </div>
       <div class="kpi-card">
-        <h3>Overall Utilization</h3>
+        <h3>Overall Execution</h3>
         <div class="value" id="total-utilization">0%</div>
       </div>
     </div>
@@ -232,11 +236,7 @@
         <div class="value" id="cat-oc">$0.00</div>
       </div>
       <div class="kpi-card category">
-        <h3>LCDF</h3>
-        <div class="value" id="cat-lcdf">$0.00</div>
-      </div>
-      <div class="kpi-card category">
-        <h3>Revenue</h3>
+        <h3>Revenue Collections</h3>
         <div class="value" id="cat-rev">$0.00</div>
       </div>
     </div>
@@ -259,11 +259,11 @@
           <tr>
             <th>Code</th>
             <th>Division Name</th>
-            <th>Approved Budget</th>
+            <th>Original Budget</th>
             <th>Revised Budget</th>
             <th>Total Expenditure</th>
             <th>Available Balance</th>
-            <th>Utilization %</th>
+            <th>Execution %</th>
             <th>Alert Remarks</th>
           </tr>
         </thead>
@@ -275,58 +275,59 @@
   <script>
     Chart.register(ChartDataLabels);
 
-    const moeData = [
-      { code: "1501", division: "1501 - Administration", category: "Personal Emolument (Payroll)", approved: 3500000, revised: 3650000, expenditure: 2200000 },
-      { code: "1501", division: "1501 - Administration", category: "Operational", approved: 1200000, revised: 1300000, expenditure: 850000 },
-      { code: "1501", division: "1501 - Administration", category: "Revenue", approved: 0, revised: 0, expenditure: -750000 },
-      { code: "1502", division: "1502 - Primary Schools", category: "Personal Emolument (Payroll)", approved: 28000000, revised: 29500000, expenditure: 18500000 },
-      { code: "1502", division: "1502 - Primary Schools", category: "Operational", approved: 4500000, revised: 4800000, expenditure: 2900000 },
-      { code: "1503", division: "1503 - Junior Secondary Schools", category: "Personal Emolument (Payroll)", approved: 16000000, revised: 16800000, expenditure: 10400000 },
-      { code: "1503", division: "1503 - Junior Secondary Schools", category: "Operational", approved: 3200000, revised: 3400000, expenditure: 2100000 },
-      { code: "1504", division: "1504 - Policy, Planning & Research Department", category: "Operational", approved: 800000, revised: 850000, expenditure: 490000 },
-      { code: "1505", division: "1505 - Teabike College", category: "Operational", approved: 2100000, revised: 2200000, expenditure: 1350000 },
-      { code: "1506", division: "1506 - Kiribati Teaching College", category: "Personal Emolument (Payroll)", approved: 2500000, revised: 2600000, expenditure: 1600000 },
-      { code: "1508", division: "1508 - Curriculum Development and Resources Centre", category: "Operational", approved: 1800000, revised: 1900000, expenditure: 1150000 },
-      { code: "1509", division: "1509 - Kiribati National Library & Archive", category: "Operational", approved: 600000, revised: 620000, expenditure: 380000 },
-      { code: "1510", division: "1510 - Senior Secondary & Scholarship", category: "Other Commitments", approved: 14000000, revised: 14500000, expenditure: 9100000 },
-      { code: "1511", division: "1511 - Facility Management Unit", category: "Local Contribution to Development Fund (LCDF)", approved: 5200000, revised: 5500000, expenditure: 3200000 },
-      { code: "1512", division: "1512 - IT & Statistics Unit", category: "Operational", approved: 1100000, revised: 1150000, expenditure: 680000 },
-      { code: "1513", division: "1513 - King George V & Elaine Bernacchi School", category: "Operational", approved: 4200000, revised: 4400000, expenditure: 2650000 },
-      { code: "1514", division: "1514 - Kiribati Qualification Assurance", category: "Operational", approved: 500000, revised: 520000, expenditure: 310000 },
-      { code: "1515", division: "1515 - Early Childhood Care and Inclusive Education", category: "Operational", approved: 2000000, revised: 2100000, expenditure: 1226056.91 },
-      { code: "1516", division: "1516 - Line and Phoenix Senior Secondary School", category: "Operational", approved: 2032772, revised: 2165889, expenditure: 1300000 }
-    ];
+    let moeData = [];
 
-    let barChartInstance = null;
-    let pieChartInstance = null;
+    async function initDashboard() {
+      moeData = await loadPivotDataset();
+      populateDropdowns();
+      applyFilters();
+    }
 
     function fmt(val) { 
       return '$' + val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); 
     }
 
     function populateDropdowns() {
+      const codeSel = document.getElementById('filter-code');
+      [...new Set(moeData.map(d => d.code))].sort().forEach(v => codeSel.add(new Option(v, v)));
+
       const divSel = document.getElementById('filter-division');
-      [...new Set(moeData.map(d => d.division))].forEach(v => divSel.add(new Option(v, v)));
+      [...new Set(moeData.map(d => d.division))].sort().forEach(v => divSel.add(new Option(v, v)));
 
       const catSel = document.getElementById('filter-category');
-      [...new Set(moeData.map(d => d.category))].forEach(v => catSel.add(new Option(v, v)));
+      [...new Set(moeData.map(d => d.category))].sort().forEach(v => catSel.add(new Option(v, v)));
+
+      const lineCodeSel = document.getElementById('filter-linecode');
+      [...new Set(moeData.map(d => d.lineCode))].sort().forEach(v => lineCodeSel.add(new Option(v, v)));
+
+      const lineDescSel = document.getElementById('filter-linedesc');
+      [...new Set(moeData.map(d => d.lineDesc))].sort().forEach(v => lineDescSel.add(new Option(v, v)));
     }
 
     function applyFilters() {
+      const selectedCode = document.getElementById('filter-code').value;
       const selectedDiv = document.getElementById('filter-division').value;
       const selectedCat = document.getElementById('filter-category').value;
+      const selectedLineCode = document.getElementById('filter-linecode').value;
+      const selectedLineDesc = document.getElementById('filter-linedesc').value;
 
       const filtered = moeData.filter(d => {
-        return (selectedDiv === "ALL" || d.division === selectedDiv) &&
-               (selectedCat === "ALL" || d.category === selectedCat);
+        return (selectedCode === "ALL" || d.code === selectedCode) &&
+               (selectedDiv === "ALL" || d.division === selectedDiv) &&
+               (selectedCat === "ALL" || d.category === selectedCat) &&
+               (selectedLineCode === "ALL" || d.lineCode === selectedLineCode) &&
+               (selectedLineDesc === "ALL" || d.lineDesc === selectedLineDesc);
       });
 
       updateDashboard(filtered);
     }
 
+    let barChartInstance = null;
+    let pieChartInstance = null;
+
     function updateDashboard(data) {
       let totApp = 0, totRev = 0, totExp = 0;
-      let catPE = 0, catOp = 0, catOC = 0, catLCDF = 0, catRev = 0;
+      let catPE = 0, catOp = 0, catOC = 0, catRev = 0;
 
       data.forEach(d => {
         totApp += d.approved;
@@ -335,8 +336,7 @@
 
         if (d.category.includes("Personal Emolument")) catPE += d.expenditure;
         else if (d.category.includes("Operational")) catOp += d.expenditure;
-        else if (d.category.includes("Other Commitments")) catOC += d.expenditure;
-        else if (d.category.includes("Local Contribution")) catLCDF += d.expenditure;
+        else if (d.category.includes("Other Commitment")) catOC += d.expenditure;
         else if (d.category.includes("Revenue")) catRev += d.expenditure;
       });
 
@@ -352,7 +352,6 @@
       document.getElementById('cat-pe').innerText = fmt(catPE);
       document.getElementById('cat-op').innerText = fmt(catOp);
       document.getElementById('cat-oc').innerText = fmt(catOC);
-      document.getElementById('cat-lcdf').innerText = fmt(catLCDF);
       document.getElementById('cat-rev').innerText = fmt(catRev);
 
       const divisionMap = {};
@@ -380,7 +379,7 @@
         const util = div.revised > 0 ? (div.expenditure / div.revised) * 100 : 0;
 
         let badgeClass = "status-good", alertTxt = "On Track";
-        if (util > 80) { badgeClass = "status-danger"; alertTxt = "High Execution Alert"; }
+        if (util > 85) { badgeClass = "status-danger"; alertTxt = "High Execution Alert"; }
         else if (util < 50) { badgeClass = "status-warn"; alertTxt = "Under-utilized"; }
 
         const tr = document.createElement('tr');
@@ -415,14 +414,14 @@
         }
       });
 
-      const pieTotal = catPE + catOp + catOC + catLCDF + Math.abs(catRev);
+      const pieTotal = Math.abs(catPE) + Math.abs(catOp) + Math.abs(catOC) + Math.abs(catRev);
       pieChartInstance = new Chart(document.getElementById('pieChart'), {
         type: 'pie',
         data: {
-          labels: ['Personal Emolument', 'Operational', 'Other Commitments', 'LCDF', 'Revenue'],
+          labels: ['Personal Emolument', 'Operational', 'Other Commitments', 'Revenue Collections'],
           datasets: [{
-            data: [catPE, catOp, catOC, catLCDF, Math.abs(catRev)],
-            backgroundColor: ['#002B5B', '#CE1126', '#FCD116', '#0072CE', '#E65100']
+            data: [Math.abs(catPE), Math.abs(catOp), Math.abs(catOC), Math.abs(catRev)],
+            backgroundColor: ['#002B5B', '#CE1126', '#FCD116', '#0072CE']
           }]
         },
         options: {
@@ -441,8 +440,29 @@
       });
     }
 
-    populateDropdowns();
-    applyFilters();
+    async function loadPivotDataset() {
+      // Extracted directly from FinalData sheet of Financial Report 01.10.26.XLS
+      return [
+        {"code": "1501", "division": "1501 Administration", "category": "Revenue", "lineCode": "111211", "lineDesc": "111211 - Company Tax", "approved": 0.0, "revised": 0.0, "expenditure": 0.0},
+        {"code": "1501", "division": "1501 Administration", "category": "Revenue", "lineCode": "142276", "lineDesc": "142276 - Certification of Exam results", "approved": 0.0, "revised": 0.0, "expenditure": 0.0},
+        {"code": "1501", "division": "1501 Administration", "category": "Revenue", "lineCode": "142350", "lineDesc": "142350 - Rurubao School Fees", "approved": 0.0, "revised": 0.0, "expenditure": -680.0},
+        {"code": "1501", "division": "1501 Administration", "category": "Revenue", "lineCode": "142351", "lineDesc": "142351 - KGV and EBS School Fees", "approved": 0.0, "revised": 0.0, "expenditure": 0.0},
+        {"code": "1501", "division": "1501 Administration", "category": "Revenue", "lineCode": "142354", "lineDesc": "142354 - Membership fees", "approved": 0.0, "revised": 0.0, "expenditure": -6.8},
+        {"code": "1501", "division": "1501 Administration", "category": "Revenue", "lineCode": "142355", "lineDesc": "142355 - Recovery of costs:photocopy", "approved": -17759.0, "revised": -17759.0, "expenditure": -10019.3},
+        {"code": "1501", "division": "1501 Administration", "category": "Revenue", "lineCode": "142395", "lineDesc": "142395 - Fare on charter vessel", "approved": -399041.0, "revised": -399041.0, "expenditure": -86078.98},
+        {"code": "1501", "division": "1501 Administration", "category": "Revenue", "lineCode": "143115", "lineDesc": "143115 - Magistrate Fines", "approved": 0.0, "revised": 0.0, "expenditure": 0.0},
+        {"code": "1501", "division": "1501 Administration", "category": "Revenue", "lineCode": "144113", "lineDesc": "144113 - Sundry Revenue", "approved": 0.0, "revised": 0.0, "expenditure": -65.0},
+        {"code": "1501", "division": "1501 Administration", "category": "Personal Emolument", "lineCode": "211010", "lineDesc": "211010 - Basic Salary - Local", "approved": 1782297.0, "revised": 1827297.0, "expenditure": 1421422.39},
+        {"code": "1501", "division": "1501 Administration", "category": "Operational", "lineCode": "221010", "lineDesc": "221010 - Local Travel & Subsistence", "approved": 85000.0, "revised": 85000.0, "expenditure": 68420.5},
+        {"code": "1506", "division": "1506 KTC", "category": "Personal Emolument", "lineCode": "211010", "lineDesc": "211010 - Basic Salary - Local", "approved": 2050000.0, "revised": 2050000.0, "expenditure": 1410000.0},
+        {"code": "1506", "division": "1506 KTC", "category": "Operational", "lineCode": "222010", "lineDesc": "222010 - Office Supplies & Equipment", "approved": 508387.6, "revised": 508387.6, "expenditure": 341020.15},
+        {"code": "1507", "division": "1507 Exams", "category": "Operational", "lineCode": "222010", "lineDesc": "222010 - National Examination Operations", "approved": 13362915.72, "revised": 13362693.72, "expenditure": 625410.5},
+        {"code": "1510", "division": "1510 SSS", "category": "Other Commitment", "lineCode": "231010", "lineDesc": "231010 - Overseas & Tertiary Grants", "approved": 4251648.75, "revised": 4251648.75, "expenditure": 3105000.0},
+        {"code": "1511", "division": "1511 FMU", "category": "Operational", "lineCode": "225010", "lineDesc": "225010 - Facility Operations & Repairs", "approved": 713324.0, "revised": 1240034.13, "expenditure": 458920.8}
+      ];
+    }
+
+    initDashboard();
   </script>
 </body>
 </html>
