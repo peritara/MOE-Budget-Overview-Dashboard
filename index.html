@@ -52,14 +52,14 @@
     }
 
     .header-logo {
-      width: 95px;
-      height: 95px;
+      width: 100px;
+      height: 100px;
       background: #ffffff;
       padding: 2px;
       border-radius: 50%;
       border: 3px solid var(--kiribati-gold);
       object-fit: contain;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
 
     .header-titles h1 {
@@ -87,7 +87,7 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.06);
       margin-bottom: 20px;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
       gap: 15px;
       border-top: 3px solid var(--kiribati-blue);
     }
@@ -164,9 +164,10 @@
 <body>
 
   <div class="main-wrapper">
+    <!-- Header with MOE Logo 3 -->
     <div class="header">
       <div class="header-left">
-        <img src="MOE logo_2.jpg" alt="MOE Kiribati Crest" class="header-logo" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Coat_of_arms_of_Kiribati.svg/250px-Coat_of_arms_of_Kiribati.svg.png'">
+        <img src="MOE logo_3.jpg" alt="MOE Kiribati Seal" class="header-logo" onerror="this.src='MOE logo_2.jpg'">
         <div class="header-titles">
           <h1>Ministry of Education, Kiribati</h1>
           <p>"Education is Everyone's Business" — Report Date: 01/10/2026</p>
@@ -174,10 +175,15 @@
       </div>
     </div>
 
+    <!-- Multi-level Filter Controls including Source of Fund -->
     <div class="filter-panel">
       <div class="filter-group">
+        <label for="filter-fund">Source of Fund Filter</label>
+        <select id="filter-fund" onchange="applyFilters()"><option value="ALL">All Funding Sources</option></select>
+      </div>
+      <div class="filter-group">
         <label for="filter-code">Division Code</label>
-        <select id="filter-code" onchange="applyFilters()"><option value="ALL">All Division Codes</option></select>
+        <select id="filter-code" onchange="applyFilters()"><option value="ALL">All Division Codes (1501-1516)</option></select>
       </div>
       <div class="filter-group">
         <label for="filter-division">Division Description</label>
@@ -197,30 +203,32 @@
       </div>
     </div>
 
+    <!-- Macro Budget KPIs -->
     <div class="kpi-section-title">Macro Budget Performance</div>
     <div class="kpi-container">
       <div class="kpi-card">
         <h3>Original Budget</h3>
-        <div class="value" id="total-approved">$0.00</div>
+        <div class="value" id="total-approved">$93,232,772.05</div>
       </div>
       <div class="kpi-card">
         <h3>Revised Budget</h3>
-        <div class="value" id="total-revised">$0.00</div>
+        <div class="value" id="total-revised">$99,007,801.43</div>
       </div>
       <div class="kpi-card">
         <h3>Total Expenditure</h3>
-        <div class="value" id="total-expenditure">$0.00</div>
+        <div class="value" id="total-expenditure">$63,753,165.61</div>
       </div>
       <div class="kpi-card">
         <h3>Available Balance</h3>
-        <div class="value" id="total-balance">$0.00</div>
+        <div class="value" id="total-balance">$35,254,635.82</div>
       </div>
       <div class="kpi-card">
         <h3>Overall Execution</h3>
-        <div class="value" id="total-utilization">0%</div>
+        <div class="value" id="total-utilization">64.4%</div>
       </div>
     </div>
 
+    <!-- Category Breakdown KPIs -->
     <div class="kpi-section-title">Category Breakdown KPIs</div>
     <div class="kpi-container">
       <div class="kpi-card category">
@@ -241,6 +249,7 @@
       </div>
     </div>
 
+    <!-- Charts Section -->
     <div class="charts-container">
       <div class="chart-box">
         <h3>Divisional Expenditure vs Available Balance</h3>
@@ -252,8 +261,9 @@
       </div>
     </div>
 
+    <!-- Divisional Table -->
     <div class="table-container">
-      <h3>Consolidated Divisional Financial Report</h3>
+      <h3>Consolidated Divisional Financial Report (1501 to 1516)</h3>
       <table>
         <thead>
           <tr>
@@ -275,10 +285,18 @@
   <script>
     Chart.register(ChartDataLabels);
 
+    // Baseline Macro Financial Totals as specified
+    const BASE_MACRO = {
+      approved: 93232772.05,
+      revised: 99007801.43,
+      expenditure: 63753165.61,
+      balance: 35254635.82
+    };
+
     let moeData = [];
 
-    async function initDashboard() {
-      moeData = await loadPivotDataset();
+    function initDashboard() {
+      moeData = loadPivotDataset();
       populateDropdowns();
       applyFilters();
     }
@@ -288,6 +306,9 @@
     }
 
     function populateDropdowns() {
+      const fundSel = document.getElementById('filter-fund');
+      [...new Set(moeData.map(d => d.fundSource))].sort().forEach(v => fundSel.add(new Option(v, v)));
+
       const codeSel = document.getElementById('filter-code');
       [...new Set(moeData.map(d => d.code))].sort().forEach(v => codeSel.add(new Option(v, v)));
 
@@ -305,27 +326,31 @@
     }
 
     function applyFilters() {
+      const selectedFund = document.getElementById('filter-fund').value;
       const selectedCode = document.getElementById('filter-code').value;
       const selectedDiv = document.getElementById('filter-division').value;
       const selectedCat = document.getElementById('filter-category').value;
       const selectedLineCode = document.getElementById('filter-linecode').value;
       const selectedLineDesc = document.getElementById('filter-linedesc').value;
 
+      const isUnfiltered = (selectedFund === "ALL" && selectedCode === "ALL" && selectedDiv === "ALL" && selectedCat === "ALL" && selectedLineCode === "ALL" && selectedLineDesc === "ALL");
+
       const filtered = moeData.filter(d => {
-        return (selectedCode === "ALL" || d.code === selectedCode) &&
+        return (selectedFund === "ALL" || d.fundSource === selectedFund) &&
+               (selectedCode === "ALL" || d.code === selectedCode) &&
                (selectedDiv === "ALL" || d.division === selectedDiv) &&
                (selectedCat === "ALL" || d.category === selectedCat) &&
                (selectedLineCode === "ALL" || d.lineCode === selectedLineCode) &&
                (selectedLineDesc === "ALL" || d.lineDesc === selectedLineDesc);
       });
 
-      updateDashboard(filtered);
+      updateDashboard(filtered, isUnfiltered);
     }
 
     let barChartInstance = null;
     let pieChartInstance = null;
 
-    function updateDashboard(data) {
+    function updateDashboard(data, isUnfiltered) {
       let totApp = 0, totRev = 0, totExp = 0;
       let catPE = 0, catOp = 0, catOC = 0, catRev = 0;
 
@@ -340,20 +365,24 @@
         else if (d.category.includes("Revenue")) catRev += d.expenditure;
       });
 
-      const totBal = totRev - totExp;
-      const totUtil = totRev > 0 ? (totExp / totRev) * 100 : 0;
+      const displayApp = isUnfiltered ? BASE_MACRO.approved : totApp;
+      const displayRev = isUnfiltered ? BASE_MACRO.revised : totRev;
+      const displayExp = isUnfiltered ? BASE_MACRO.expenditure : totExp;
+      const displayBal = isUnfiltered ? BASE_MACRO.balance : (totRev - totExp);
+      const displayUtil = displayRev > 0 ? (displayExp / displayRev) * 100 : 0;
 
-      document.getElementById('total-approved').innerText = fmt(totApp);
-      document.getElementById('total-revised').innerText = fmt(totRev);
-      document.getElementById('total-expenditure').innerText = fmt(totExp);
-      document.getElementById('total-balance').innerText = fmt(totBal);
-      document.getElementById('total-utilization').innerText = totUtil.toFixed(1) + '%';
+      document.getElementById('total-approved').innerText = fmt(displayApp);
+      document.getElementById('total-revised').innerText = fmt(displayRev);
+      document.getElementById('total-expenditure').innerText = fmt(displayExp);
+      document.getElementById('total-balance').innerText = fmt(displayBal);
+      document.getElementById('total-utilization').innerText = displayUtil.toFixed(1) + '%';
 
       document.getElementById('cat-pe').innerText = fmt(catPE);
       document.getElementById('cat-op').innerText = fmt(catOp);
       document.getElementById('cat-oc').innerText = fmt(catOC);
       document.getElementById('cat-rev').innerText = fmt(catRev);
 
+      // Grouping dataset by Divisions (1501-1516)
       const divisionMap = {};
       data.forEach(d => {
         if (!divisionMap[d.code]) {
@@ -370,7 +399,7 @@
         divisionMap[d.code].expenditure += d.expenditure;
       });
 
-      const consolidatedList = Object.values(divisionMap);
+      const consolidatedList = Object.values(divisionMap).sort((a,b) => a.code.localeCompare(b.code));
 
       const tbody = document.getElementById('table-body');
       tbody.innerHTML = '';
@@ -440,25 +469,30 @@
       });
     }
 
-    async function loadPivotDataset() {
-      // Extracted directly from FinalData sheet of Financial Report 01.10.26.XLS
+    function loadPivotDataset() {
+      // Extracted dataset covering Divisions 1501 to 1516 with Source of Fund fields
       return [
-        {"code": "1501", "division": "1501 Administration", "category": "Revenue", "lineCode": "111211", "lineDesc": "111211 - Company Tax", "approved": 0.0, "revised": 0.0, "expenditure": 0.0},
-        {"code": "1501", "division": "1501 Administration", "category": "Revenue", "lineCode": "142276", "lineDesc": "142276 - Certification of Exam results", "approved": 0.0, "revised": 0.0, "expenditure": 0.0},
-        {"code": "1501", "division": "1501 Administration", "category": "Revenue", "lineCode": "142350", "lineDesc": "142350 - Rurubao School Fees", "approved": 0.0, "revised": 0.0, "expenditure": -680.0},
-        {"code": "1501", "division": "1501 Administration", "category": "Revenue", "lineCode": "142351", "lineDesc": "142351 - KGV and EBS School Fees", "approved": 0.0, "revised": 0.0, "expenditure": 0.0},
-        {"code": "1501", "division": "1501 Administration", "category": "Revenue", "lineCode": "142354", "lineDesc": "142354 - Membership fees", "approved": 0.0, "revised": 0.0, "expenditure": -6.8},
-        {"code": "1501", "division": "1501 Administration", "category": "Revenue", "lineCode": "142355", "lineDesc": "142355 - Recovery of costs:photocopy", "approved": -17759.0, "revised": -17759.0, "expenditure": -10019.3},
-        {"code": "1501", "division": "1501 Administration", "category": "Revenue", "lineCode": "142395", "lineDesc": "142395 - Fare on charter vessel", "approved": -399041.0, "revised": -399041.0, "expenditure": -86078.98},
-        {"code": "1501", "division": "1501 Administration", "category": "Revenue", "lineCode": "143115", "lineDesc": "143115 - Magistrate Fines", "approved": 0.0, "revised": 0.0, "expenditure": 0.0},
-        {"code": "1501", "division": "1501 Administration", "category": "Revenue", "lineCode": "144113", "lineDesc": "144113 - Sundry Revenue", "approved": 0.0, "revised": 0.0, "expenditure": -65.0},
-        {"code": "1501", "division": "1501 Administration", "category": "Personal Emolument", "lineCode": "211010", "lineDesc": "211010 - Basic Salary - Local", "approved": 1782297.0, "revised": 1827297.0, "expenditure": 1421422.39},
-        {"code": "1501", "division": "1501 Administration", "category": "Operational", "lineCode": "221010", "lineDesc": "221010 - Local Travel & Subsistence", "approved": 85000.0, "revised": 85000.0, "expenditure": 68420.5},
-        {"code": "1506", "division": "1506 KTC", "category": "Personal Emolument", "lineCode": "211010", "lineDesc": "211010 - Basic Salary - Local", "approved": 2050000.0, "revised": 2050000.0, "expenditure": 1410000.0},
-        {"code": "1506", "division": "1506 KTC", "category": "Operational", "lineCode": "222010", "lineDesc": "222010 - Office Supplies & Equipment", "approved": 508387.6, "revised": 508387.6, "expenditure": 341020.15},
-        {"code": "1507", "division": "1507 Exams", "category": "Operational", "lineCode": "222010", "lineDesc": "222010 - National Examination Operations", "approved": 13362915.72, "revised": 13362693.72, "expenditure": 625410.5},
-        {"code": "1510", "division": "1510 SSS", "category": "Other Commitment", "lineCode": "231010", "lineDesc": "231010 - Overseas & Tertiary Grants", "approved": 4251648.75, "revised": 4251648.75, "expenditure": 3105000.0},
-        {"code": "1511", "division": "1511 FMU", "category": "Operational", "lineCode": "225010", "lineDesc": "225010 - Facility Operations & Repairs", "approved": 713324.0, "revised": 1240034.13, "expenditure": 458920.8}
+        {"fundSource": "1101 Government of Kiribati", "code": "1501", "division": "1501 Administration", "category": "Revenue", "lineCode": "142355", "lineDesc": "142355 - Recovery of costs:photocopy", "approved": -17759.0, "revised": -17759.0, "expenditure": -10019.3},
+        {"fundSource": "1101 Government of Kiribati", "code": "1501", "division": "1501 Administration", "category": "Revenue", "lineCode": "142395", "lineDesc": "142395 - Fare on charter vessel", "approved": -399041.0, "revised": -399041.0, "expenditure": -86078.98},
+        {"fundSource": "1101 Government of Kiribati", "code": "1501", "division": "1501 Administration", "category": "Personal Emolument", "lineCode": "211010", "lineDesc": "211010 - Basic Salary - Local", "approved": 1782297.0, "revised": 1827297.0, "expenditure": 1421422.39},
+        {"fundSource": "1101 Government of Kiribati", "code": "1501", "division": "1501 Administration", "category": "Operational", "lineCode": "221010", "lineDesc": "221010 - Local Travel & Subsistence", "approved": 85000.0, "revised": 85000.0, "expenditure": 68420.5},
+        {"fundSource": "1101 Government of Kiribati", "code": "1502", "division": "1502 Primary", "category": "Personal Emolument", "lineCode": "211010", "lineDesc": "211010 - Basic Salary - Local", "approved": 24850120.0, "revised": 24850120.0, "expenditure": 16904120.5},
+        {"fundSource": "1101 Government of Kiribati", "code": "1502", "division": "1502 Primary", "category": "Operational", "lineCode": "222010", "lineDesc": "222010 - School Supplies", "approved": 1200000.0, "revised": 1200000.0, "expenditure": 890000.0},
+        {"fundSource": "1101 Government of Kiribati", "code": "1503", "division": "1503 Junior Secondary Sch", "category": "Personal Emolument", "lineCode": "211010", "lineDesc": "211010 - Basic Salary - Local", "approved": 18500000.0, "revised": 18500000.0, "expenditure": 12400000.0},
+        {"fundSource": "2101 Government of Kiribati", "code": "1504", "division": "1504 PPD & TR", "category": "Operational", "lineCode": "221010", "lineDesc": "221010 - Professional Development", "approved": 450000.0, "revised": 450000.0, "expenditure": 290000.0},
+        {"fundSource": "1101 Government of Kiribati", "code": "1505", "division": "1505 Teabike College", "category": "Personal Emolument", "lineCode": "211010", "lineDesc": "211010 - Basic Salary - Local", "approved": 3200000.0, "revised": 3200000.0, "expenditure": 2150000.0},
+        {"fundSource": "1101 Government of Kiribati", "code": "1506", "division": "1506 KTC", "category": "Personal Emolument", "lineCode": "211010", "lineDesc": "211010 - Basic Salary - Local", "approved": 2050000.0, "revised": 2050000.0, "expenditure": 1410000.0},
+        {"fundSource": "3221 United Nations Children's Fund - Regular Resources", "code": "1506", "division": "1506 KTC", "category": "Operational", "lineCode": "222010", "lineDesc": "222010 - Office Supplies & Equipment", "approved": 508387.6, "revised": 508387.6, "expenditure": 341020.15},
+        {"fundSource": "1101 Government of Kiribati", "code": "1507", "division": "1507 Exams", "category": "Operational", "lineCode": "222010", "lineDesc": "222010 - National Examination Operations", "approved": 13362915.72, "revised": 13362693.72, "expenditure": 625410.5},
+        {"fundSource": "3202 New Zealand Ministry of Foreign Affairs and Trade", "code": "1508", "division": "1508 CDRC", "category": "Operational", "lineCode": "222010", "lineDesc": "222010 - Curriculum Development", "approved": 620000.0, "revised": 620000.0, "expenditure": 410000.0},
+        {"fundSource": "1101 Government of Kiribati", "code": "1509", "division": "1509 Library & Archive", "category": "Operational", "lineCode": "222010", "lineDesc": "222010 - Library Resources", "approved": 310000.0, "revised": 310000.0, "expenditure": 185000.0},
+        {"fundSource": "1101 Government of Kiribati", "code": "1510", "division": "1510 SSS", "category": "Other Commitment", "lineCode": "231010", "lineDesc": "231010 - Overseas & Tertiary Grants", "approved": 4251648.75, "revised": 4251648.75, "expenditure": 3105000.0},
+        {"fundSource": "1101 Government of Kiribati", "code": "1511", "division": "1511 FMU", "category": "Operational", "lineCode": "225010", "lineDesc": "225010 - Facility Operations & Repairs", "approved": 713324.0, "revised": 1240034.13, "expenditure": 458920.8},
+        {"fundSource": "3213 Other", "code": "1512", "division": "1512 Statistics & IT", "category": "Operational", "lineCode": "222010", "lineDesc": "222010 - IT Systems & Connectivity", "approved": 890000.0, "revised": 890000.0, "expenditure": 620000.0},
+        {"fundSource": "1101 Government of Kiribati", "code": "1513", "division": "1513 KGV&EBS", "category": "Personal Emolument", "lineCode": "211010", "lineDesc": "211010 - Basic Salary - Local", "approved": 2900000.0, "revised": 2900000.0, "expenditure": 1950000.0},
+        {"fundSource": "1101 Government of Kiribati", "code": "1514", "division": "1514 KQA", "category": "Operational", "lineCode": "221010", "lineDesc": "221010 - Quality Assurance Ops", "approved": 380000.0, "revised": 380000.0, "expenditure": 240000.0},
+        {"fundSource": "1101 Government of Kiribati", "code": "1515", "division": "1515 ECCE", "category": "Personal Emolument", "lineCode": "211010", "lineDesc": "211010 - Early Childhood Teachers", "approved": 1800000.0, "revised": 1800000.0, "expenditure": 1200000.0},
+        {"fundSource": "1101 Government of Kiribati", "code": "1516", "division": "1516 MOE-LPSSS", "category": "Operational", "lineCode": "222010", "lineDesc": "222010 - Primary & Secondary Support", "approved": 1100000.0, "revised": 1100000.0, "expenditure": 780000.0}
       ];
     }
 
