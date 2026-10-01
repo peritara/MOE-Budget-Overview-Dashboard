@@ -51,6 +51,7 @@
       gap: 20px;
     }
 
+    /* Container for logo image */
     .header-logo-container {
       width: 90px;
       height: 90px;
@@ -60,8 +61,15 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow: hidden;
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
       flex-shrink: 0;
+    }
+
+    .header-logo-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     .header-titles h1 {
@@ -94,10 +102,31 @@
       border-top: 3px solid var(--kiribati-blue);
     }
 
-    .filter-group { display: flex; flex-direction: column; }
-    .filter-group label { font-size: 11px; font-weight: bold; color: var(--kiribati-blue); margin-bottom: 6px; text-transform: uppercase; }
-    .filter-group select { padding: 9px 12px; border-radius: 6px; border: 1px solid #ccc; font-size: 12px; outline: none; background: #fff; }
-    .filter-group select:focus { border-color: var(--kiribati-red); }
+    .filter-group { 
+      display: flex; 
+      flex-direction: column; 
+    }
+    
+    .filter-group label { 
+      font-size: 11px; 
+      font-weight: bold; 
+      color: var(--kiribati-blue); 
+      margin-bottom: 6px; 
+      text-transform: uppercase; 
+    }
+    
+    .filter-group select { 
+      padding: 9px 12px; 
+      border-radius: 6px; 
+      border: 1px solid #ccc; 
+      font-size: 12px; 
+      outline: none; 
+      background: #fff; 
+    }
+    
+    .filter-group select:focus { 
+      border-color: var(--kiribati-red); 
+    }
 
     .kpi-section-title { 
       font-size: 13px; 
@@ -123,9 +152,23 @@
       border-left: 5px solid var(--kiribati-blue);
     }
 
-    .kpi-card.category { border-left-color: var(--kiribati-red); }
-    .kpi-card h3 { margin: 0; font-size: 11px; color: #555; text-transform: uppercase; }
-    .kpi-card .value { font-size: 15px; font-weight: bold; margin-top: 8px; color: #111; }
+    .kpi-card.category { 
+      border-left-color: var(--kiribati-red); 
+    }
+    
+    .kpi-card h3 { 
+      margin: 0; 
+      font-size: 11px; 
+      color: #555; 
+      text-transform: uppercase; 
+    }
+    
+    .kpi-card .value { 
+      font-size: 15px; 
+      font-weight: bold; 
+      margin-top: 8px; 
+      color: #111; 
+    }
 
     .charts-container {
       display: grid;
@@ -141,7 +184,13 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
 
-    .chart-box h3 { margin-top: 0; color: var(--kiribati-blue); font-size: 14px; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; }
+    .chart-box h3 { 
+      margin-top: 0; 
+      color: var(--kiribati-blue); 
+      font-size: 14px; 
+      border-bottom: 2px solid #f0f0f0; 
+      padding-bottom: 8px; 
+    }
 
     .table-container {
       background: white;
@@ -151,13 +200,39 @@
       overflow-x: auto;
     }
 
-    .table-container h3 { margin-top: 0; color: var(--kiribati-blue); font-size: 15px; margin-bottom: 15px; }
+    .table-container h3 { 
+      margin-top: 0; 
+      color: var(--kiribati-blue); 
+      font-size: 15px; 
+      margin-bottom: 15px; 
+    }
 
-    table { width: 100%; border-collapse: collapse; font-size: 12px; }
-    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #eef2f5; }
-    th { background-color: #f4f7fb; font-weight: 700; color: var(--kiribati-blue); }
+    table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      font-size: 12px; 
+    }
     
-    .status-badge { padding: 4px 9px; border-radius: 4px; font-size: 10px; font-weight: bold; display: inline-block; }
+    th, td { 
+      padding: 10px 12px; 
+      text-align: left; 
+      border-bottom: 1px solid #eef2f5; 
+    }
+    
+    th { 
+      background-color: #f4f7fb; 
+      font-weight: 700; 
+      color: var(--kiribati-blue); 
+    }
+    
+    .status-badge { 
+      padding: 4px 9px; 
+      border-radius: 4px; 
+      font-size: 10px; 
+      font-weight: bold; 
+      display: inline-block; 
+    }
+    
     .status-good { background: #d4edda; color: #155724; }
     .status-warn { background: #fff3cd; color: #856404; }
     .status-danger { background: #f8d7da; color: #721c24; }
@@ -166,19 +241,11 @@
 <body>
 
   <div class="main-wrapper">
-    <!-- Header with Embedded SVG Crest Emblem -->
+    <!-- Header with MOE Logo Image -->
     <div class="header">
       <div class="header-left">
         <div class="header-logo-container">
-          <svg width="70" height="70" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="48" fill="#CE1126" stroke="#FCD116" stroke-width="3"/>
-            <path d="M 10,55 Q 25,50 40,55 T 70,55 T 100,55 L 100,90 L 10,90 Z" fill="#002B5B"/>
-            <path d="M 10,65 Q 25,60 40,65 T 70,65 T 100,65" stroke="#FFFFFF" stroke-width="3" fill="none"/>
-            <path d="M 10,75 Q 25,70 40,75 T 70,75 T 100,75" stroke="#FFFFFF" stroke-width="3" fill="none"/>
-            <circle cx="50" cy="38" r="14" fill="#FCD116"/>
-            <path d="M 50,12 L 53,22 L 50,18 L 47,22 Z" fill="#FCD116"/>
-            <path d="M 35,22 Q 45,15 65,22 Q 55,20 35,22" fill="#FFFFFF"/>
-          </svg>
+          <img src="MOE logo.jpg" alt="Ministry of Education, Kiribati Logo">
         </div>
         <div class="header-titles">
           <h1>Ministry of Education, Kiribati</h1>
@@ -504,7 +571,6 @@
     }
 
     function loadDataset() {
-      // Extracted dataset for 1501-1516
       return [
         {"fundSource": "1101 Government of Kiribati", "code": "1501", "division": "1501 Administration", "category": "Personal Emolument", "lineCode": "211010", "lineDesc": "Basic Salary - Local", "approved": 1782297.0, "revised": 1827297.0, "expenditure": 1421422.39},
         {"fundSource": "1101 Government of Kiribati", "code": "1501", "division": "1501 Administration", "category": "Operational", "lineCode": "221010", "lineDesc": "Local Travel & Subsistence", "approved": 85000.0, "revised": 85000.0, "expenditure": 68420.50},
