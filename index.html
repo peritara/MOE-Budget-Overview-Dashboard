@@ -51,15 +51,17 @@
       gap: 20px;
     }
 
-    .header-logo {
-      width: 100px;
-      height: 100px;
+    .header-logo-container {
+      width: 90px;
+      height: 90px;
       background: #ffffff;
-      padding: 2px;
       border-radius: 50%;
       border: 3px solid var(--kiribati-gold);
-      object-fit: contain;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      flex-shrink: 0;
     }
 
     .header-titles h1 {
@@ -164,10 +166,20 @@
 <body>
 
   <div class="main-wrapper">
-    <!-- Header with MOE Logo 3 -->
+    <!-- Header with Embedded SVG Crest Emblem -->
     <div class="header">
       <div class="header-left">
-        <img src="MOE logo_3.jpg" alt="MOE Kiribati Seal" class="header-logo" onerror="this.src='MOE logo_2.jpg'">
+        <div class="header-logo-container">
+          <svg width="70" height="70" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="48" fill="#CE1126" stroke="#FCD116" stroke-width="3"/>
+            <path d="M 10,55 Q 25,50 40,55 T 70,55 T 100,55 L 100,90 L 10,90 Z" fill="#002B5B"/>
+            <path d="M 10,65 Q 25,60 40,65 T 70,65 T 100,65" stroke="#FFFFFF" stroke-width="3" fill="none"/>
+            <path d="M 10,75 Q 25,70 40,75 T 70,75 T 100,75" stroke="#FFFFFF" stroke-width="3" fill="none"/>
+            <circle cx="50" cy="38" r="14" fill="#FCD116"/>
+            <path d="M 50,12 L 53,22 L 50,18 L 47,22 Z" fill="#FCD116"/>
+            <path d="M 35,22 Q 45,15 65,22 Q 55,20 35,22" fill="#FFFFFF"/>
+          </svg>
+        </div>
         <div class="header-titles">
           <h1>Ministry of Education, Kiribati</h1>
           <p>"Education is Everyone's Business" — Report Date: 01/10/2026</p>
@@ -175,7 +187,7 @@
       </div>
     </div>
 
-    <!-- Multi-level Filter Controls including Source of Fund -->
+    <!-- Multi-level Filter Controls -->
     <div class="filter-panel">
       <div class="filter-group">
         <label for="filter-fund">Source of Fund Filter</label>
@@ -285,7 +297,6 @@
   <script>
     Chart.register(ChartDataLabels);
 
-    // Baseline Macro Financial Totals as specified
     const BASE_MACRO = {
       approved: 93232772.05,
       revised: 99007801.43,
@@ -293,10 +304,30 @@
       balance: 35254635.82
     };
 
+    // Full list of 16 Divisions (1501-1516)
+    const DIVISIONS_MASTER = [
+      { code: "1501", name: "1501 Administration" },
+      { code: "1502", name: "1502 Primary" },
+      { code: "1503", name: "1503 Junior Secondary Sch" },
+      { code: "1504", name: "1504 PPD & TR" },
+      { code: "1505", name: "1505 Teabike College" },
+      { code: "1506", name: "1506 KTC" },
+      { code: "1507", name: "1507 Exams" },
+      { code: "1508", name: "1508 CDRC" },
+      { code: "1509", name: "1509 Library & Archive" },
+      { code: "1510", name: "1510 SSS" },
+      { code: "1511", name: "1511 FMU" },
+      { code: "1512", name: "1512 Statistics & IT" },
+      { code: "1513", name: "1513 KGV&EBS" },
+      { code: "1514", name: "1514 KQA" },
+      { code: "1515", name: "1515 ECCE" },
+      { code: "1516", name: "1516 MOE-LPSSS" }
+    ];
+
     let moeData = [];
 
     function initDashboard() {
-      moeData = loadPivotDataset();
+      moeData = loadDataset();
       populateDropdowns();
       applyFilters();
     }
@@ -310,10 +341,10 @@
       [...new Set(moeData.map(d => d.fundSource))].sort().forEach(v => fundSel.add(new Option(v, v)));
 
       const codeSel = document.getElementById('filter-code');
-      [...new Set(moeData.map(d => d.code))].sort().forEach(v => codeSel.add(new Option(v, v)));
+      DIVISIONS_MASTER.forEach(d => codeSel.add(new Option(d.code, d.code)));
 
       const divSel = document.getElementById('filter-division');
-      [...new Set(moeData.map(d => d.division))].sort().forEach(v => divSel.add(new Option(v, v)));
+      DIVISIONS_MASTER.forEach(d => divSel.add(new Option(d.name, d.name)));
 
       const catSel = document.getElementById('filter-category');
       [...new Set(moeData.map(d => d.category))].sort().forEach(v => catSel.add(new Option(v, v)));
@@ -322,7 +353,7 @@
       [...new Set(moeData.map(d => d.lineCode))].sort().forEach(v => lineCodeSel.add(new Option(v, v)));
 
       const lineDescSel = document.getElementById('filter-linedesc');
-      [...new Set(moeData.map(d => d.lineDesc))].sort().forEach(v => lineDescSel.add(new Option(v, v)));
+      [...new Set(moeData.map(d => d.lineDesc))].filter(v => v.trim() !== "").sort().forEach(v => lineDescSel.add(new Option(v, v)));
     }
 
     function applyFilters() {
@@ -382,21 +413,24 @@
       document.getElementById('cat-oc').innerText = fmt(catOC);
       document.getElementById('cat-rev').innerText = fmt(catRev);
 
-      // Grouping dataset by Divisions (1501-1516)
+      // Consolidate data for all 1501-1516 divisions
       const divisionMap = {};
+      DIVISIONS_MASTER.forEach(d => {
+        divisionMap[d.code] = {
+          code: d.code,
+          division: d.name,
+          approved: 0,
+          revised: 0,
+          expenditure: 0
+        };
+      });
+
       data.forEach(d => {
-        if (!divisionMap[d.code]) {
-          divisionMap[d.code] = {
-            code: d.code,
-            division: d.division,
-            approved: 0,
-            revised: 0,
-            expenditure: 0
-          };
+        if (divisionMap[d.code]) {
+          divisionMap[d.code].approved += d.approved;
+          divisionMap[d.code].revised += d.revised;
+          divisionMap[d.code].expenditure += d.expenditure;
         }
-        divisionMap[d.code].approved += d.approved;
-        divisionMap[d.code].revised += d.revised;
-        divisionMap[d.code].expenditure += d.expenditure;
       });
 
       const consolidatedList = Object.values(divisionMap).sort((a,b) => a.code.localeCompare(b.code));
@@ -409,7 +443,7 @@
 
         let badgeClass = "status-good", alertTxt = "On Track";
         if (util > 85) { badgeClass = "status-danger"; alertTxt = "High Execution Alert"; }
-        else if (util < 50) { badgeClass = "status-warn"; alertTxt = "Under-utilized"; }
+        else if (util < 50 && div.revised > 0) { badgeClass = "status-warn"; alertTxt = "Under-utilized"; }
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -469,30 +503,28 @@
       });
     }
 
-    function loadPivotDataset() {
-      // Extracted dataset covering Divisions 1501 to 1516 with Source of Fund fields
+    function loadDataset() {
+      // Extracted dataset for 1501-1516
       return [
-        {"fundSource": "1101 Government of Kiribati", "code": "1501", "division": "1501 Administration", "category": "Revenue", "lineCode": "142355", "lineDesc": "142355 - Recovery of costs:photocopy", "approved": -17759.0, "revised": -17759.0, "expenditure": -10019.3},
-        {"fundSource": "1101 Government of Kiribati", "code": "1501", "division": "1501 Administration", "category": "Revenue", "lineCode": "142395", "lineDesc": "142395 - Fare on charter vessel", "approved": -399041.0, "revised": -399041.0, "expenditure": -86078.98},
-        {"fundSource": "1101 Government of Kiribati", "code": "1501", "division": "1501 Administration", "category": "Personal Emolument", "lineCode": "211010", "lineDesc": "211010 - Basic Salary - Local", "approved": 1782297.0, "revised": 1827297.0, "expenditure": 1421422.39},
-        {"fundSource": "1101 Government of Kiribati", "code": "1501", "division": "1501 Administration", "category": "Operational", "lineCode": "221010", "lineDesc": "221010 - Local Travel & Subsistence", "approved": 85000.0, "revised": 85000.0, "expenditure": 68420.5},
-        {"fundSource": "1101 Government of Kiribati", "code": "1502", "division": "1502 Primary", "category": "Personal Emolument", "lineCode": "211010", "lineDesc": "211010 - Basic Salary - Local", "approved": 24850120.0, "revised": 24850120.0, "expenditure": 16904120.5},
-        {"fundSource": "1101 Government of Kiribati", "code": "1502", "division": "1502 Primary", "category": "Operational", "lineCode": "222010", "lineDesc": "222010 - School Supplies", "approved": 1200000.0, "revised": 1200000.0, "expenditure": 890000.0},
-        {"fundSource": "1101 Government of Kiribati", "code": "1503", "division": "1503 Junior Secondary Sch", "category": "Personal Emolument", "lineCode": "211010", "lineDesc": "211010 - Basic Salary - Local", "approved": 18500000.0, "revised": 18500000.0, "expenditure": 12400000.0},
-        {"fundSource": "2101 Government of Kiribati", "code": "1504", "division": "1504 PPD & TR", "category": "Operational", "lineCode": "221010", "lineDesc": "221010 - Professional Development", "approved": 450000.0, "revised": 450000.0, "expenditure": 290000.0},
-        {"fundSource": "1101 Government of Kiribati", "code": "1505", "division": "1505 Teabike College", "category": "Personal Emolument", "lineCode": "211010", "lineDesc": "211010 - Basic Salary - Local", "approved": 3200000.0, "revised": 3200000.0, "expenditure": 2150000.0},
-        {"fundSource": "1101 Government of Kiribati", "code": "1506", "division": "1506 KTC", "category": "Personal Emolument", "lineCode": "211010", "lineDesc": "211010 - Basic Salary - Local", "approved": 2050000.0, "revised": 2050000.0, "expenditure": 1410000.0},
-        {"fundSource": "3221 United Nations Children's Fund - Regular Resources", "code": "1506", "division": "1506 KTC", "category": "Operational", "lineCode": "222010", "lineDesc": "222010 - Office Supplies & Equipment", "approved": 508387.6, "revised": 508387.6, "expenditure": 341020.15},
-        {"fundSource": "1101 Government of Kiribati", "code": "1507", "division": "1507 Exams", "category": "Operational", "lineCode": "222010", "lineDesc": "222010 - National Examination Operations", "approved": 13362915.72, "revised": 13362693.72, "expenditure": 625410.5},
-        {"fundSource": "3202 New Zealand Ministry of Foreign Affairs and Trade", "code": "1508", "division": "1508 CDRC", "category": "Operational", "lineCode": "222010", "lineDesc": "222010 - Curriculum Development", "approved": 620000.0, "revised": 620000.0, "expenditure": 410000.0},
-        {"fundSource": "1101 Government of Kiribati", "code": "1509", "division": "1509 Library & Archive", "category": "Operational", "lineCode": "222010", "lineDesc": "222010 - Library Resources", "approved": 310000.0, "revised": 310000.0, "expenditure": 185000.0},
-        {"fundSource": "1101 Government of Kiribati", "code": "1510", "division": "1510 SSS", "category": "Other Commitment", "lineCode": "231010", "lineDesc": "231010 - Overseas & Tertiary Grants", "approved": 4251648.75, "revised": 4251648.75, "expenditure": 3105000.0},
-        {"fundSource": "1101 Government of Kiribati", "code": "1511", "division": "1511 FMU", "category": "Operational", "lineCode": "225010", "lineDesc": "225010 - Facility Operations & Repairs", "approved": 713324.0, "revised": 1240034.13, "expenditure": 458920.8},
-        {"fundSource": "3213 Other", "code": "1512", "division": "1512 Statistics & IT", "category": "Operational", "lineCode": "222010", "lineDesc": "222010 - IT Systems & Connectivity", "approved": 890000.0, "revised": 890000.0, "expenditure": 620000.0},
-        {"fundSource": "1101 Government of Kiribati", "code": "1513", "division": "1513 KGV&EBS", "category": "Personal Emolument", "lineCode": "211010", "lineDesc": "211010 - Basic Salary - Local", "approved": 2900000.0, "revised": 2900000.0, "expenditure": 1950000.0},
-        {"fundSource": "1101 Government of Kiribati", "code": "1514", "division": "1514 KQA", "category": "Operational", "lineCode": "221010", "lineDesc": "221010 - Quality Assurance Ops", "approved": 380000.0, "revised": 380000.0, "expenditure": 240000.0},
-        {"fundSource": "1101 Government of Kiribati", "code": "1515", "division": "1515 ECCE", "category": "Personal Emolument", "lineCode": "211010", "lineDesc": "211010 - Early Childhood Teachers", "approved": 1800000.0, "revised": 1800000.0, "expenditure": 1200000.0},
-        {"fundSource": "1101 Government of Kiribati", "code": "1516", "division": "1516 MOE-LPSSS", "category": "Operational", "lineCode": "222010", "lineDesc": "222010 - Primary & Secondary Support", "approved": 1100000.0, "revised": 1100000.0, "expenditure": 780000.0}
+        {"fundSource": "1101 Government of Kiribati", "code": "1501", "division": "1501 Administration", "category": "Personal Emolument", "lineCode": "211010", "lineDesc": "Basic Salary - Local", "approved": 1782297.0, "revised": 1827297.0, "expenditure": 1421422.39},
+        {"fundSource": "1101 Government of Kiribati", "code": "1501", "division": "1501 Administration", "category": "Operational", "lineCode": "221010", "lineDesc": "Local Travel & Subsistence", "approved": 85000.0, "revised": 85000.0, "expenditure": 68420.50},
+        {"fundSource": "1101 Government of Kiribati", "code": "1502", "division": "1502 Primary", "category": "Personal Emolument", "lineCode": "211010", "lineDesc": "Basic Salary - Local", "approved": 24850120.0, "revised": 24850120.0, "expenditure": 16904120.50},
+        {"fundSource": "1101 Government of Kiribati", "code": "1502", "division": "1502 Primary", "category": "Operational", "lineCode": "222010", "lineDesc": "School Supplies", "approved": 1200000.0, "revised": 1200000.0, "expenditure": 890000.00},
+        {"fundSource": "1101 Government of Kiribati", "code": "1503", "division": "1503 Junior Secondary Sch", "category": "Personal Emolument", "lineCode": "211010", "lineDesc": "Basic Salary - Local", "approved": 18500000.0, "revised": 18500000.0, "expenditure": 12400000.00},
+        {"fundSource": "2101 Government of Kiribati", "code": "1504", "division": "1504 PPD & TR", "category": "Operational", "lineCode": "221010", "lineDesc": "Professional Development", "approved": 450000.0, "revised": 450000.0, "expenditure": 290000.00},
+        {"fundSource": "1101 Government of Kiribati", "code": "1505", "division": "1505 Teabike College", "category": "Personal Emolument", "lineCode": "211010", "lineDesc": "Basic Salary - Local", "approved": 3200000.0, "revised": 3200000.0, "expenditure": 2150000.00},
+        {"fundSource": "1101 Government of Kiribati", "code": "1506", "division": "1506 KTC", "category": "Personal Emolument", "lineCode": "211010", "lineDesc": "Basic Salary - Local", "approved": 2050000.0, "revised": 2050000.0, "expenditure": 1410000.00},
+        {"fundSource": "3221 United Nations Children's Fund - Regular Resources", "code": "1506", "division": "1506 KTC", "category": "Operational", "lineCode": "222010", "lineDesc": "Office Supplies & Equipment", "approved": 508387.60, "revised": 508387.60, "expenditure": 341020.15},
+        {"fundSource": "1101 Government of Kiribati", "code": "1507", "division": "1507 Exams", "category": "Operational", "lineCode": "222010", "lineDesc": "National Examination Operations", "approved": 13362915.72, "revised": 13362693.72, "expenditure": 625410.50},
+        {"fundSource": "3202 New Zealand Ministry of Foreign Affairs and Trade", "code": "1508", "division": "1508 CDRC", "category": "Operational", "lineCode": "222010", "lineDesc": "Curriculum Development", "approved": 620000.0, "revised": 620000.0, "expenditure": 410000.00},
+        {"fundSource": "1101 Government of Kiribati", "code": "1509", "division": "1509 Library & Archive", "category": "Operational", "lineCode": "222010", "lineDesc": "Library Resources", "approved": 310000.0, "revised": 310000.0, "expenditure": 185000.00},
+        {"fundSource": "1101 Government of Kiribati", "code": "1510", "division": "1510 SSS", "category": "Other Commitment", "lineCode": "231010", "lineDesc": "Overseas & Tertiary Grants", "approved": 4251648.75, "revised": 4251648.75, "expenditure": 3105000.00},
+        {"fundSource": "1101 Government of Kiribati", "code": "1511", "division": "1511 FMU", "category": "Operational", "lineCode": "225010", "lineDesc": "Facility Operations & Repairs", "approved": 713324.0, "revised": 1240034.13, "expenditure": 458920.80},
+        {"fundSource": "3213 Other", "code": "1512", "division": "1512 Statistics & IT", "category": "Operational", "lineCode": "222010", "lineDesc": "IT Systems & Connectivity", "approved": 890000.0, "revised": 890000.0, "expenditure": 620000.00},
+        {"fundSource": "1101 Government of Kiribati", "code": "1513", "division": "1513 KGV&EBS", "category": "Personal Emolument", "lineCode": "211010", "lineDesc": "Basic Salary - Local", "approved": 2900000.0, "revised": 2900000.0, "expenditure": 1950000.00},
+        {"fundSource": "1101 Government of Kiribati", "code": "1514", "division": "1514 KQA", "category": "Operational", "lineCode": "221010", "lineDesc": "Quality Assurance Ops", "approved": 380000.0, "revised": 380000.0, "expenditure": 240000.00},
+        {"fundSource": "1101 Government of Kiribati", "code": "1515", "division": "1515 ECCE", "category": "Personal Emolument", "lineCode": "211010", "lineDesc": "Early Childhood Teachers", "approved": 1800000.0, "revised": 1800000.0, "expenditure": 1200000.00},
+        {"fundSource": "1101 Government of Kiribati", "code": "1516", "division": "1516 MOE-LPSSS", "category": "Operational", "lineCode": "222010", "lineDesc": "Primary & Secondary Support", "approved": 1100000.0, "revised": 1100000.0, "expenditure": 780000.00}
       ];
     }
 
